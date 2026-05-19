@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class QuizProgressBar extends StatelessWidget {
   final int total;
@@ -22,21 +23,25 @@ class QuizProgressBar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                // Show exit confirmation dialog
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
+                  builder: (dialogCtx) => AlertDialog(
                     title: const Text('Вийти з тесту?'),
                     content: const Text('Ваш поточний прогрес буде втрачено.'),
                     actions: [
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () => Navigator.of(dialogCtx).pop(),
                         child: const Text('Скасувати'),
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop(); // pop quiz page
+                          Navigator.of(dialogCtx).pop();
+                          // Quiz — root-маршрут, тож може не бути куди pop-ити.
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/');
+                          }
                         },
                         child: const Text('Вийти'),
                       ),

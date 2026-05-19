@@ -26,6 +26,37 @@ class StreakReminderService {
         ),
       ),
     );
+
+    // Android 13+ потребує явного запиту POST_NOTIFICATIONS у рантаймі.
+    final androidImpl = _plugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    await androidImpl?.requestNotificationsPermission();
+
+    // iOS — на випадок якщо ініціалізація не показала діалог.
+    final iosImpl = _plugin
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+    await iosImpl?.requestPermissions(alert: true, badge: true, sound: true);
+  }
+
+  /// Перевіряє, чи дозволено сповіщення на цьому пристрої.
+  Future<bool> areNotificationsEnabled() async {
+    final androidImpl = _plugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    if (androidImpl != null) {
+      return (await androidImpl.areNotificationsEnabled()) ?? false;
+    }
+    final iosImpl = _plugin
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+    if (iosImpl != null) {
+      final settings = await iosImpl.checkPermissions();
+      return settings?.isEnabled ?? false;
+    }
+    return true; // інші платформи
+  }
+
+  /// Скасовує всі заплановані сповіщення.
+  Future<void> cancelAll() async {
+    await _plugin.cancelAll();
   }
 
   /// Планує щоденне нагадування о 19:00 з поточним стріком у заголовку.

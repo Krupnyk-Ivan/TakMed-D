@@ -1641,21 +1641,1319 @@ class UserProgressCompanion extends UpdateCompanion<UserProgressDB> {
   }
 }
 
+class $QuizAttemptsTable extends QuizAttempts
+    with TableInfo<$QuizAttemptsTable, QuizAttemptDB> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QuizAttemptsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _lessonRemoteIdMeta =
+      const VerificationMeta('lessonRemoteId');
+  @override
+  late final GeneratedColumn<String> lessonRemoteId = GeneratedColumn<String>(
+      'lesson_remote_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _totalQuestionsMeta =
+      const VerificationMeta('totalQuestions');
+  @override
+  late final GeneratedColumn<int> totalQuestions = GeneratedColumn<int>(
+      'total_questions', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _correctAnswersMeta =
+      const VerificationMeta('correctAnswers');
+  @override
+  late final GeneratedColumn<int> correctAnswers = GeneratedColumn<int>(
+      'correct_answers', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _scorePercentMeta =
+      const VerificationMeta('scorePercent');
+  @override
+  late final GeneratedColumn<int> scorePercent = GeneratedColumn<int>(
+      'score_percent', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _earnedXpMeta =
+      const VerificationMeta('earnedXp');
+  @override
+  late final GeneratedColumn<int> earnedXp = GeneratedColumn<int>(
+      'earned_xp', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _weakTopicsMeta =
+      const VerificationMeta('weakTopics');
+  @override
+  late final GeneratedColumn<String> weakTopics = GeneratedColumn<String>(
+      'weak_topics', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('[]'));
+  static const VerificationMeta _attemptedAtMeta =
+      const VerificationMeta('attemptedAt');
+  @override
+  late final GeneratedColumn<DateTime> attemptedAt = GeneratedColumn<DateTime>(
+      'attempted_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        userId,
+        lessonRemoteId,
+        totalQuestions,
+        correctAnswers,
+        scorePercent,
+        earnedXp,
+        weakTopics,
+        attemptedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'quiz_attempts';
+  @override
+  VerificationContext validateIntegrity(Insertable<QuizAttemptDB> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('lesson_remote_id')) {
+      context.handle(
+          _lessonRemoteIdMeta,
+          lessonRemoteId.isAcceptableOrUnknown(
+              data['lesson_remote_id']!, _lessonRemoteIdMeta));
+    }
+    if (data.containsKey('total_questions')) {
+      context.handle(
+          _totalQuestionsMeta,
+          totalQuestions.isAcceptableOrUnknown(
+              data['total_questions']!, _totalQuestionsMeta));
+    } else if (isInserting) {
+      context.missing(_totalQuestionsMeta);
+    }
+    if (data.containsKey('correct_answers')) {
+      context.handle(
+          _correctAnswersMeta,
+          correctAnswers.isAcceptableOrUnknown(
+              data['correct_answers']!, _correctAnswersMeta));
+    } else if (isInserting) {
+      context.missing(_correctAnswersMeta);
+    }
+    if (data.containsKey('score_percent')) {
+      context.handle(
+          _scorePercentMeta,
+          scorePercent.isAcceptableOrUnknown(
+              data['score_percent']!, _scorePercentMeta));
+    } else if (isInserting) {
+      context.missing(_scorePercentMeta);
+    }
+    if (data.containsKey('earned_xp')) {
+      context.handle(_earnedXpMeta,
+          earnedXp.isAcceptableOrUnknown(data['earned_xp']!, _earnedXpMeta));
+    } else if (isInserting) {
+      context.missing(_earnedXpMeta);
+    }
+    if (data.containsKey('weak_topics')) {
+      context.handle(
+          _weakTopicsMeta,
+          weakTopics.isAcceptableOrUnknown(
+              data['weak_topics']!, _weakTopicsMeta));
+    }
+    if (data.containsKey('attempted_at')) {
+      context.handle(
+          _attemptedAtMeta,
+          attemptedAt.isAcceptableOrUnknown(
+              data['attempted_at']!, _attemptedAtMeta));
+    } else if (isInserting) {
+      context.missing(_attemptedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  QuizAttemptDB map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QuizAttemptDB(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      lessonRemoteId: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}lesson_remote_id']),
+      totalQuestions: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}total_questions'])!,
+      correctAnswers: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}correct_answers'])!,
+      scorePercent: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}score_percent'])!,
+      earnedXp: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}earned_xp'])!,
+      weakTopics: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}weak_topics'])!,
+      attemptedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}attempted_at'])!,
+    );
+  }
+
+  @override
+  $QuizAttemptsTable createAlias(String alias) {
+    return $QuizAttemptsTable(attachedDatabase, alias);
+  }
+}
+
+class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
+  final int id;
+
+  /// ID користувача.
+  final String userId;
+
+  /// Remote ID уроку-тесту (nullable — для standalone quiz).
+  final String? lessonRemoteId;
+
+  /// Кількість питань.
+  final int totalQuestions;
+
+  /// Кількість правильних відповідей.
+  final int correctAnswers;
+
+  /// Відсоток правильних (0-100).
+  final int scorePercent;
+
+  /// Зароблені XP.
+  final int earnedXp;
+
+  /// JSON-масив слабких тем.
+  final String weakTopics;
+
+  /// Час проходження.
+  final DateTime attemptedAt;
+  const QuizAttemptDB(
+      {required this.id,
+      required this.userId,
+      this.lessonRemoteId,
+      required this.totalQuestions,
+      required this.correctAnswers,
+      required this.scorePercent,
+      required this.earnedXp,
+      required this.weakTopics,
+      required this.attemptedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['user_id'] = Variable<String>(userId);
+    if (!nullToAbsent || lessonRemoteId != null) {
+      map['lesson_remote_id'] = Variable<String>(lessonRemoteId);
+    }
+    map['total_questions'] = Variable<int>(totalQuestions);
+    map['correct_answers'] = Variable<int>(correctAnswers);
+    map['score_percent'] = Variable<int>(scorePercent);
+    map['earned_xp'] = Variable<int>(earnedXp);
+    map['weak_topics'] = Variable<String>(weakTopics);
+    map['attempted_at'] = Variable<DateTime>(attemptedAt);
+    return map;
+  }
+
+  QuizAttemptsCompanion toCompanion(bool nullToAbsent) {
+    return QuizAttemptsCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      lessonRemoteId: lessonRemoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lessonRemoteId),
+      totalQuestions: Value(totalQuestions),
+      correctAnswers: Value(correctAnswers),
+      scorePercent: Value(scorePercent),
+      earnedXp: Value(earnedXp),
+      weakTopics: Value(weakTopics),
+      attemptedAt: Value(attemptedAt),
+    );
+  }
+
+  factory QuizAttemptDB.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QuizAttemptDB(
+      id: serializer.fromJson<int>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      lessonRemoteId: serializer.fromJson<String?>(json['lessonRemoteId']),
+      totalQuestions: serializer.fromJson<int>(json['totalQuestions']),
+      correctAnswers: serializer.fromJson<int>(json['correctAnswers']),
+      scorePercent: serializer.fromJson<int>(json['scorePercent']),
+      earnedXp: serializer.fromJson<int>(json['earnedXp']),
+      weakTopics: serializer.fromJson<String>(json['weakTopics']),
+      attemptedAt: serializer.fromJson<DateTime>(json['attemptedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'userId': serializer.toJson<String>(userId),
+      'lessonRemoteId': serializer.toJson<String?>(lessonRemoteId),
+      'totalQuestions': serializer.toJson<int>(totalQuestions),
+      'correctAnswers': serializer.toJson<int>(correctAnswers),
+      'scorePercent': serializer.toJson<int>(scorePercent),
+      'earnedXp': serializer.toJson<int>(earnedXp),
+      'weakTopics': serializer.toJson<String>(weakTopics),
+      'attemptedAt': serializer.toJson<DateTime>(attemptedAt),
+    };
+  }
+
+  QuizAttemptDB copyWith(
+          {int? id,
+          String? userId,
+          Value<String?> lessonRemoteId = const Value.absent(),
+          int? totalQuestions,
+          int? correctAnswers,
+          int? scorePercent,
+          int? earnedXp,
+          String? weakTopics,
+          DateTime? attemptedAt}) =>
+      QuizAttemptDB(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        lessonRemoteId:
+            lessonRemoteId.present ? lessonRemoteId.value : this.lessonRemoteId,
+        totalQuestions: totalQuestions ?? this.totalQuestions,
+        correctAnswers: correctAnswers ?? this.correctAnswers,
+        scorePercent: scorePercent ?? this.scorePercent,
+        earnedXp: earnedXp ?? this.earnedXp,
+        weakTopics: weakTopics ?? this.weakTopics,
+        attemptedAt: attemptedAt ?? this.attemptedAt,
+      );
+  QuizAttemptDB copyWithCompanion(QuizAttemptsCompanion data) {
+    return QuizAttemptDB(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      lessonRemoteId: data.lessonRemoteId.present
+          ? data.lessonRemoteId.value
+          : this.lessonRemoteId,
+      totalQuestions: data.totalQuestions.present
+          ? data.totalQuestions.value
+          : this.totalQuestions,
+      correctAnswers: data.correctAnswers.present
+          ? data.correctAnswers.value
+          : this.correctAnswers,
+      scorePercent: data.scorePercent.present
+          ? data.scorePercent.value
+          : this.scorePercent,
+      earnedXp: data.earnedXp.present ? data.earnedXp.value : this.earnedXp,
+      weakTopics:
+          data.weakTopics.present ? data.weakTopics.value : this.weakTopics,
+      attemptedAt:
+          data.attemptedAt.present ? data.attemptedAt.value : this.attemptedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QuizAttemptDB(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('lessonRemoteId: $lessonRemoteId, ')
+          ..write('totalQuestions: $totalQuestions, ')
+          ..write('correctAnswers: $correctAnswers, ')
+          ..write('scorePercent: $scorePercent, ')
+          ..write('earnedXp: $earnedXp, ')
+          ..write('weakTopics: $weakTopics, ')
+          ..write('attemptedAt: $attemptedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, userId, lessonRemoteId, totalQuestions,
+      correctAnswers, scorePercent, earnedXp, weakTopics, attemptedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QuizAttemptDB &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.lessonRemoteId == this.lessonRemoteId &&
+          other.totalQuestions == this.totalQuestions &&
+          other.correctAnswers == this.correctAnswers &&
+          other.scorePercent == this.scorePercent &&
+          other.earnedXp == this.earnedXp &&
+          other.weakTopics == this.weakTopics &&
+          other.attemptedAt == this.attemptedAt);
+}
+
+class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
+  final Value<int> id;
+  final Value<String> userId;
+  final Value<String?> lessonRemoteId;
+  final Value<int> totalQuestions;
+  final Value<int> correctAnswers;
+  final Value<int> scorePercent;
+  final Value<int> earnedXp;
+  final Value<String> weakTopics;
+  final Value<DateTime> attemptedAt;
+  const QuizAttemptsCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.lessonRemoteId = const Value.absent(),
+    this.totalQuestions = const Value.absent(),
+    this.correctAnswers = const Value.absent(),
+    this.scorePercent = const Value.absent(),
+    this.earnedXp = const Value.absent(),
+    this.weakTopics = const Value.absent(),
+    this.attemptedAt = const Value.absent(),
+  });
+  QuizAttemptsCompanion.insert({
+    this.id = const Value.absent(),
+    required String userId,
+    this.lessonRemoteId = const Value.absent(),
+    required int totalQuestions,
+    required int correctAnswers,
+    required int scorePercent,
+    required int earnedXp,
+    this.weakTopics = const Value.absent(),
+    required DateTime attemptedAt,
+  })  : userId = Value(userId),
+        totalQuestions = Value(totalQuestions),
+        correctAnswers = Value(correctAnswers),
+        scorePercent = Value(scorePercent),
+        earnedXp = Value(earnedXp),
+        attemptedAt = Value(attemptedAt);
+  static Insertable<QuizAttemptDB> custom({
+    Expression<int>? id,
+    Expression<String>? userId,
+    Expression<String>? lessonRemoteId,
+    Expression<int>? totalQuestions,
+    Expression<int>? correctAnswers,
+    Expression<int>? scorePercent,
+    Expression<int>? earnedXp,
+    Expression<String>? weakTopics,
+    Expression<DateTime>? attemptedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (lessonRemoteId != null) 'lesson_remote_id': lessonRemoteId,
+      if (totalQuestions != null) 'total_questions': totalQuestions,
+      if (correctAnswers != null) 'correct_answers': correctAnswers,
+      if (scorePercent != null) 'score_percent': scorePercent,
+      if (earnedXp != null) 'earned_xp': earnedXp,
+      if (weakTopics != null) 'weak_topics': weakTopics,
+      if (attemptedAt != null) 'attempted_at': attemptedAt,
+    });
+  }
+
+  QuizAttemptsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? userId,
+      Value<String?>? lessonRemoteId,
+      Value<int>? totalQuestions,
+      Value<int>? correctAnswers,
+      Value<int>? scorePercent,
+      Value<int>? earnedXp,
+      Value<String>? weakTopics,
+      Value<DateTime>? attemptedAt}) {
+    return QuizAttemptsCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      lessonRemoteId: lessonRemoteId ?? this.lessonRemoteId,
+      totalQuestions: totalQuestions ?? this.totalQuestions,
+      correctAnswers: correctAnswers ?? this.correctAnswers,
+      scorePercent: scorePercent ?? this.scorePercent,
+      earnedXp: earnedXp ?? this.earnedXp,
+      weakTopics: weakTopics ?? this.weakTopics,
+      attemptedAt: attemptedAt ?? this.attemptedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (lessonRemoteId.present) {
+      map['lesson_remote_id'] = Variable<String>(lessonRemoteId.value);
+    }
+    if (totalQuestions.present) {
+      map['total_questions'] = Variable<int>(totalQuestions.value);
+    }
+    if (correctAnswers.present) {
+      map['correct_answers'] = Variable<int>(correctAnswers.value);
+    }
+    if (scorePercent.present) {
+      map['score_percent'] = Variable<int>(scorePercent.value);
+    }
+    if (earnedXp.present) {
+      map['earned_xp'] = Variable<int>(earnedXp.value);
+    }
+    if (weakTopics.present) {
+      map['weak_topics'] = Variable<String>(weakTopics.value);
+    }
+    if (attemptedAt.present) {
+      map['attempted_at'] = Variable<DateTime>(attemptedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QuizAttemptsCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('lessonRemoteId: $lessonRemoteId, ')
+          ..write('totalQuestions: $totalQuestions, ')
+          ..write('correctAnswers: $correctAnswers, ')
+          ..write('scorePercent: $scorePercent, ')
+          ..write('earnedXp: $earnedXp, ')
+          ..write('weakTopics: $weakTopics, ')
+          ..write('attemptedAt: $attemptedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ChatMessagesLocalTable extends ChatMessagesLocal
+    with TableInfo<$ChatMessagesLocalTable, ChatMessageDB> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChatMessagesLocalTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _roleMeta = const VerificationMeta('role');
+  @override
+  late final GeneratedColumn<String> role = GeneratedColumn<String>(
+      'role', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _contentMeta =
+      const VerificationMeta('content');
+  @override
+  late final GeneratedColumn<String> content = GeneratedColumn<String>(
+      'content', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, userId, role, content, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chat_messages_local';
+  @override
+  VerificationContext validateIntegrity(Insertable<ChatMessageDB> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    } else if (isInserting) {
+      context.missing(_userIdMeta);
+    }
+    if (data.containsKey('role')) {
+      context.handle(
+          _roleMeta, role.isAcceptableOrUnknown(data['role']!, _roleMeta));
+    } else if (isInserting) {
+      context.missing(_roleMeta);
+    }
+    if (data.containsKey('content')) {
+      context.handle(_contentMeta,
+          content.isAcceptableOrUnknown(data['content']!, _contentMeta));
+    } else if (isInserting) {
+      context.missing(_contentMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ChatMessageDB map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChatMessageDB(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      role: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}role'])!,
+      content: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}content'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $ChatMessagesLocalTable createAlias(String alias) {
+    return $ChatMessagesLocalTable(attachedDatabase, alias);
+  }
+}
+
+class ChatMessageDB extends DataClass implements Insertable<ChatMessageDB> {
+  /// UUID з Supabase (або тимчасовий локальний для pending).
+  final String id;
+  final String userId;
+  final String role;
+  final String content;
+  final DateTime createdAt;
+  const ChatMessageDB(
+      {required this.id,
+      required this.userId,
+      required this.role,
+      required this.content,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['role'] = Variable<String>(role);
+    map['content'] = Variable<String>(content);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ChatMessagesLocalCompanion toCompanion(bool nullToAbsent) {
+    return ChatMessagesLocalCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      role: Value(role),
+      content: Value(content),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ChatMessageDB.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChatMessageDB(
+      id: serializer.fromJson<String>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      role: serializer.fromJson<String>(json['role']),
+      content: serializer.fromJson<String>(json['content']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'userId': serializer.toJson<String>(userId),
+      'role': serializer.toJson<String>(role),
+      'content': serializer.toJson<String>(content),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ChatMessageDB copyWith(
+          {String? id,
+          String? userId,
+          String? role,
+          String? content,
+          DateTime? createdAt}) =>
+      ChatMessageDB(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        role: role ?? this.role,
+        content: content ?? this.content,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  ChatMessageDB copyWithCompanion(ChatMessagesLocalCompanion data) {
+    return ChatMessageDB(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      role: data.role.present ? data.role.value : this.role,
+      content: data.content.present ? data.content.value : this.content,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChatMessageDB(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('role: $role, ')
+          ..write('content: $content, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, userId, role, content, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChatMessageDB &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.role == this.role &&
+          other.content == this.content &&
+          other.createdAt == this.createdAt);
+}
+
+class ChatMessagesLocalCompanion extends UpdateCompanion<ChatMessageDB> {
+  final Value<String> id;
+  final Value<String> userId;
+  final Value<String> role;
+  final Value<String> content;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ChatMessagesLocalCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.role = const Value.absent(),
+    this.content = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ChatMessagesLocalCompanion.insert({
+    required String id,
+    required String userId,
+    required String role,
+    required String content,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        userId = Value(userId),
+        role = Value(role),
+        content = Value(content),
+        createdAt = Value(createdAt);
+  static Insertable<ChatMessageDB> custom({
+    Expression<String>? id,
+    Expression<String>? userId,
+    Expression<String>? role,
+    Expression<String>? content,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (role != null) 'role': role,
+      if (content != null) 'content': content,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ChatMessagesLocalCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? userId,
+      Value<String>? role,
+      Value<String>? content,
+      Value<DateTime>? createdAt,
+      Value<int>? rowid}) {
+    return ChatMessagesLocalCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      role: role ?? this.role,
+      content: content ?? this.content,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (role.present) {
+      map['role'] = Variable<String>(role.value);
+    }
+    if (content.present) {
+      map['content'] = Variable<String>(content.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChatMessagesLocalCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('role: $role, ')
+          ..write('content: $content, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $MarchHistoryTable extends MarchHistory
+    with TableInfo<$MarchHistoryTable, MarchHistoryDB> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MarchHistoryTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+      'user_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(''));
+  static const VerificationMeta _startedAtMeta =
+      const VerificationMeta('startedAt');
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+      'started_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _totalDurationSecondsMeta =
+      const VerificationMeta('totalDurationSeconds');
+  @override
+  late final GeneratedColumn<int> totalDurationSeconds = GeneratedColumn<int>(
+      'total_duration_seconds', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _successRateMeta =
+      const VerificationMeta('successRate');
+  @override
+  late final GeneratedColumn<int> successRate = GeneratedColumn<int>(
+      'success_rate', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _weakTopicsMeta =
+      const VerificationMeta('weakTopics');
+  @override
+  late final GeneratedColumn<String> weakTopics = GeneratedColumn<String>(
+      'weak_topics', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('[]'));
+  static const VerificationMeta _itemsJsonMeta =
+      const VerificationMeta('itemsJson');
+  @override
+  late final GeneratedColumn<String> itemsJson = GeneratedColumn<String>(
+      'items_json', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('[]'));
+  static const VerificationMeta _isDirtyMeta =
+      const VerificationMeta('isDirty');
+  @override
+  late final GeneratedColumn<bool> isDirty = GeneratedColumn<bool>(
+      'is_dirty', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_dirty" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _syncedAtMeta =
+      const VerificationMeta('syncedAt');
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+      'synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        userId,
+        startedAt,
+        totalDurationSeconds,
+        successRate,
+        weakTopics,
+        itemsJson,
+        isDirty,
+        syncedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'march_history';
+  @override
+  VerificationContext validateIntegrity(Insertable<MarchHistoryDB> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('user_id')) {
+      context.handle(_userIdMeta,
+          userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta));
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(_startedAtMeta,
+          startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta));
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('total_duration_seconds')) {
+      context.handle(
+          _totalDurationSecondsMeta,
+          totalDurationSeconds.isAcceptableOrUnknown(
+              data['total_duration_seconds']!, _totalDurationSecondsMeta));
+    } else if (isInserting) {
+      context.missing(_totalDurationSecondsMeta);
+    }
+    if (data.containsKey('success_rate')) {
+      context.handle(
+          _successRateMeta,
+          successRate.isAcceptableOrUnknown(
+              data['success_rate']!, _successRateMeta));
+    } else if (isInserting) {
+      context.missing(_successRateMeta);
+    }
+    if (data.containsKey('weak_topics')) {
+      context.handle(
+          _weakTopicsMeta,
+          weakTopics.isAcceptableOrUnknown(
+              data['weak_topics']!, _weakTopicsMeta));
+    }
+    if (data.containsKey('items_json')) {
+      context.handle(_itemsJsonMeta,
+          itemsJson.isAcceptableOrUnknown(data['items_json']!, _itemsJsonMeta));
+    }
+    if (data.containsKey('is_dirty')) {
+      context.handle(_isDirtyMeta,
+          isDirty.isAcceptableOrUnknown(data['is_dirty']!, _isDirtyMeta));
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(_syncedAtMeta,
+          syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MarchHistoryDB map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MarchHistoryDB(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      userId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}user_id'])!,
+      startedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}started_at'])!,
+      totalDurationSeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}total_duration_seconds'])!,
+      successRate: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}success_rate'])!,
+      weakTopics: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}weak_topics'])!,
+      itemsJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}items_json'])!,
+      isDirty: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_dirty'])!,
+      syncedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}synced_at']),
+    );
+  }
+
+  @override
+  $MarchHistoryTable createAlias(String alias) {
+    return $MarchHistoryTable(attachedDatabase, alias);
+  }
+}
+
+class MarchHistoryDB extends DataClass implements Insertable<MarchHistoryDB> {
+  final int id;
+
+  /// ID користувача (порожній для гостя).
+  final String userId;
+
+  /// Час старту сесії.
+  final DateTime startedAt;
+
+  /// Загальна тривалість у секундах.
+  final int totalDurationSeconds;
+
+  /// % правильних відповідей у мікро-квізах (0–100).
+  final int successRate;
+
+  /// JSON-масив кодів кроків зі слабкими результатами (наприклад ["M","R"]).
+  final String weakTopics;
+
+  /// JSON з покроковою аналітикою (elapsedSeconds, quizAnsweredCorrectly).
+  final String itemsJson;
+
+  /// Чи синхронізовано з сервером.
+  final bool isDirty;
+  final DateTime? syncedAt;
+  const MarchHistoryDB(
+      {required this.id,
+      required this.userId,
+      required this.startedAt,
+      required this.totalDurationSeconds,
+      required this.successRate,
+      required this.weakTopics,
+      required this.itemsJson,
+      required this.isDirty,
+      this.syncedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['user_id'] = Variable<String>(userId);
+    map['started_at'] = Variable<DateTime>(startedAt);
+    map['total_duration_seconds'] = Variable<int>(totalDurationSeconds);
+    map['success_rate'] = Variable<int>(successRate);
+    map['weak_topics'] = Variable<String>(weakTopics);
+    map['items_json'] = Variable<String>(itemsJson);
+    map['is_dirty'] = Variable<bool>(isDirty);
+    if (!nullToAbsent || syncedAt != null) {
+      map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
+    return map;
+  }
+
+  MarchHistoryCompanion toCompanion(bool nullToAbsent) {
+    return MarchHistoryCompanion(
+      id: Value(id),
+      userId: Value(userId),
+      startedAt: Value(startedAt),
+      totalDurationSeconds: Value(totalDurationSeconds),
+      successRate: Value(successRate),
+      weakTopics: Value(weakTopics),
+      itemsJson: Value(itemsJson),
+      isDirty: Value(isDirty),
+      syncedAt: syncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedAt),
+    );
+  }
+
+  factory MarchHistoryDB.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MarchHistoryDB(
+      id: serializer.fromJson<int>(json['id']),
+      userId: serializer.fromJson<String>(json['userId']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      totalDurationSeconds:
+          serializer.fromJson<int>(json['totalDurationSeconds']),
+      successRate: serializer.fromJson<int>(json['successRate']),
+      weakTopics: serializer.fromJson<String>(json['weakTopics']),
+      itemsJson: serializer.fromJson<String>(json['itemsJson']),
+      isDirty: serializer.fromJson<bool>(json['isDirty']),
+      syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'userId': serializer.toJson<String>(userId),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'totalDurationSeconds': serializer.toJson<int>(totalDurationSeconds),
+      'successRate': serializer.toJson<int>(successRate),
+      'weakTopics': serializer.toJson<String>(weakTopics),
+      'itemsJson': serializer.toJson<String>(itemsJson),
+      'isDirty': serializer.toJson<bool>(isDirty),
+      'syncedAt': serializer.toJson<DateTime?>(syncedAt),
+    };
+  }
+
+  MarchHistoryDB copyWith(
+          {int? id,
+          String? userId,
+          DateTime? startedAt,
+          int? totalDurationSeconds,
+          int? successRate,
+          String? weakTopics,
+          String? itemsJson,
+          bool? isDirty,
+          Value<DateTime?> syncedAt = const Value.absent()}) =>
+      MarchHistoryDB(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        startedAt: startedAt ?? this.startedAt,
+        totalDurationSeconds: totalDurationSeconds ?? this.totalDurationSeconds,
+        successRate: successRate ?? this.successRate,
+        weakTopics: weakTopics ?? this.weakTopics,
+        itemsJson: itemsJson ?? this.itemsJson,
+        isDirty: isDirty ?? this.isDirty,
+        syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
+      );
+  MarchHistoryDB copyWithCompanion(MarchHistoryCompanion data) {
+    return MarchHistoryDB(
+      id: data.id.present ? data.id.value : this.id,
+      userId: data.userId.present ? data.userId.value : this.userId,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      totalDurationSeconds: data.totalDurationSeconds.present
+          ? data.totalDurationSeconds.value
+          : this.totalDurationSeconds,
+      successRate:
+          data.successRate.present ? data.successRate.value : this.successRate,
+      weakTopics:
+          data.weakTopics.present ? data.weakTopics.value : this.weakTopics,
+      itemsJson: data.itemsJson.present ? data.itemsJson.value : this.itemsJson,
+      isDirty: data.isDirty.present ? data.isDirty.value : this.isDirty,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MarchHistoryDB(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('totalDurationSeconds: $totalDurationSeconds, ')
+          ..write('successRate: $successRate, ')
+          ..write('weakTopics: $weakTopics, ')
+          ..write('itemsJson: $itemsJson, ')
+          ..write('isDirty: $isDirty, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, userId, startedAt, totalDurationSeconds,
+      successRate, weakTopics, itemsJson, isDirty, syncedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MarchHistoryDB &&
+          other.id == this.id &&
+          other.userId == this.userId &&
+          other.startedAt == this.startedAt &&
+          other.totalDurationSeconds == this.totalDurationSeconds &&
+          other.successRate == this.successRate &&
+          other.weakTopics == this.weakTopics &&
+          other.itemsJson == this.itemsJson &&
+          other.isDirty == this.isDirty &&
+          other.syncedAt == this.syncedAt);
+}
+
+class MarchHistoryCompanion extends UpdateCompanion<MarchHistoryDB> {
+  final Value<int> id;
+  final Value<String> userId;
+  final Value<DateTime> startedAt;
+  final Value<int> totalDurationSeconds;
+  final Value<int> successRate;
+  final Value<String> weakTopics;
+  final Value<String> itemsJson;
+  final Value<bool> isDirty;
+  final Value<DateTime?> syncedAt;
+  const MarchHistoryCompanion({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.totalDurationSeconds = const Value.absent(),
+    this.successRate = const Value.absent(),
+    this.weakTopics = const Value.absent(),
+    this.itemsJson = const Value.absent(),
+    this.isDirty = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+  });
+  MarchHistoryCompanion.insert({
+    this.id = const Value.absent(),
+    this.userId = const Value.absent(),
+    required DateTime startedAt,
+    required int totalDurationSeconds,
+    required int successRate,
+    this.weakTopics = const Value.absent(),
+    this.itemsJson = const Value.absent(),
+    this.isDirty = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+  })  : startedAt = Value(startedAt),
+        totalDurationSeconds = Value(totalDurationSeconds),
+        successRate = Value(successRate);
+  static Insertable<MarchHistoryDB> custom({
+    Expression<int>? id,
+    Expression<String>? userId,
+    Expression<DateTime>? startedAt,
+    Expression<int>? totalDurationSeconds,
+    Expression<int>? successRate,
+    Expression<String>? weakTopics,
+    Expression<String>? itemsJson,
+    Expression<bool>? isDirty,
+    Expression<DateTime>? syncedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (userId != null) 'user_id': userId,
+      if (startedAt != null) 'started_at': startedAt,
+      if (totalDurationSeconds != null)
+        'total_duration_seconds': totalDurationSeconds,
+      if (successRate != null) 'success_rate': successRate,
+      if (weakTopics != null) 'weak_topics': weakTopics,
+      if (itemsJson != null) 'items_json': itemsJson,
+      if (isDirty != null) 'is_dirty': isDirty,
+      if (syncedAt != null) 'synced_at': syncedAt,
+    });
+  }
+
+  MarchHistoryCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? userId,
+      Value<DateTime>? startedAt,
+      Value<int>? totalDurationSeconds,
+      Value<int>? successRate,
+      Value<String>? weakTopics,
+      Value<String>? itemsJson,
+      Value<bool>? isDirty,
+      Value<DateTime?>? syncedAt}) {
+    return MarchHistoryCompanion(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      startedAt: startedAt ?? this.startedAt,
+      totalDurationSeconds: totalDurationSeconds ?? this.totalDurationSeconds,
+      successRate: successRate ?? this.successRate,
+      weakTopics: weakTopics ?? this.weakTopics,
+      itemsJson: itemsJson ?? this.itemsJson,
+      isDirty: isDirty ?? this.isDirty,
+      syncedAt: syncedAt ?? this.syncedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (totalDurationSeconds.present) {
+      map['total_duration_seconds'] = Variable<int>(totalDurationSeconds.value);
+    }
+    if (successRate.present) {
+      map['success_rate'] = Variable<int>(successRate.value);
+    }
+    if (weakTopics.present) {
+      map['weak_topics'] = Variable<String>(weakTopics.value);
+    }
+    if (itemsJson.present) {
+      map['items_json'] = Variable<String>(itemsJson.value);
+    }
+    if (isDirty.present) {
+      map['is_dirty'] = Variable<bool>(isDirty.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MarchHistoryCompanion(')
+          ..write('id: $id, ')
+          ..write('userId: $userId, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('totalDurationSeconds: $totalDurationSeconds, ')
+          ..write('successRate: $successRate, ')
+          ..write('weakTopics: $weakTopics, ')
+          ..write('itemsJson: $itemsJson, ')
+          ..write('isDirty: $isDirty, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $CoursesTable courses = $CoursesTable(this);
   late final $LessonsTable lessons = $LessonsTable(this);
   late final $UserProgressTable userProgress = $UserProgressTable(this);
+  late final $QuizAttemptsTable quizAttempts = $QuizAttemptsTable(this);
+  late final $ChatMessagesLocalTable chatMessagesLocal =
+      $ChatMessagesLocalTable(this);
+  late final $MarchHistoryTable marchHistory = $MarchHistoryTable(this);
   late final CourseDao courseDao = CourseDao(this as AppDatabase);
   late final LessonDao lessonDao = LessonDao(this as AppDatabase);
   late final ProgressDao progressDao = ProgressDao(this as AppDatabase);
+  late final QuizAttemptDao quizAttemptDao =
+      QuizAttemptDao(this as AppDatabase);
+  late final ChatDao chatDao = ChatDao(this as AppDatabase);
+  late final MarchHistoryDao marchHistoryDao =
+      MarchHistoryDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [courses, lessons, userProgress];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        courses,
+        lessons,
+        userProgress,
+        quizAttempts,
+        chatMessagesLocal,
+        marchHistory
+      ];
 }
 
 typedef $$CoursesTableCreateCompanionBuilder = CoursesCompanion Function({
@@ -2580,6 +3878,644 @@ typedef $$UserProgressTableProcessedTableManager = ProcessedTableManager<
     ),
     UserProgressDB,
     PrefetchHooks Function()>;
+typedef $$QuizAttemptsTableCreateCompanionBuilder = QuizAttemptsCompanion
+    Function({
+  Value<int> id,
+  required String userId,
+  Value<String?> lessonRemoteId,
+  required int totalQuestions,
+  required int correctAnswers,
+  required int scorePercent,
+  required int earnedXp,
+  Value<String> weakTopics,
+  required DateTime attemptedAt,
+});
+typedef $$QuizAttemptsTableUpdateCompanionBuilder = QuizAttemptsCompanion
+    Function({
+  Value<int> id,
+  Value<String> userId,
+  Value<String?> lessonRemoteId,
+  Value<int> totalQuestions,
+  Value<int> correctAnswers,
+  Value<int> scorePercent,
+  Value<int> earnedXp,
+  Value<String> weakTopics,
+  Value<DateTime> attemptedAt,
+});
+
+class $$QuizAttemptsTableFilterComposer
+    extends Composer<_$AppDatabase, $QuizAttemptsTable> {
+  $$QuizAttemptsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get lessonRemoteId => $composableBuilder(
+      column: $table.lessonRemoteId,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalQuestions => $composableBuilder(
+      column: $table.totalQuestions,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get correctAnswers => $composableBuilder(
+      column: $table.correctAnswers,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get scorePercent => $composableBuilder(
+      column: $table.scorePercent, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get earnedXp => $composableBuilder(
+      column: $table.earnedXp, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get weakTopics => $composableBuilder(
+      column: $table.weakTopics, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get attemptedAt => $composableBuilder(
+      column: $table.attemptedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$QuizAttemptsTableOrderingComposer
+    extends Composer<_$AppDatabase, $QuizAttemptsTable> {
+  $$QuizAttemptsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get lessonRemoteId => $composableBuilder(
+      column: $table.lessonRemoteId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get totalQuestions => $composableBuilder(
+      column: $table.totalQuestions,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get correctAnswers => $composableBuilder(
+      column: $table.correctAnswers,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get scorePercent => $composableBuilder(
+      column: $table.scorePercent,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get earnedXp => $composableBuilder(
+      column: $table.earnedXp, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get weakTopics => $composableBuilder(
+      column: $table.weakTopics, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get attemptedAt => $composableBuilder(
+      column: $table.attemptedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$QuizAttemptsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $QuizAttemptsTable> {
+  $$QuizAttemptsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get lessonRemoteId => $composableBuilder(
+      column: $table.lessonRemoteId, builder: (column) => column);
+
+  GeneratedColumn<int> get totalQuestions => $composableBuilder(
+      column: $table.totalQuestions, builder: (column) => column);
+
+  GeneratedColumn<int> get correctAnswers => $composableBuilder(
+      column: $table.correctAnswers, builder: (column) => column);
+
+  GeneratedColumn<int> get scorePercent => $composableBuilder(
+      column: $table.scorePercent, builder: (column) => column);
+
+  GeneratedColumn<int> get earnedXp =>
+      $composableBuilder(column: $table.earnedXp, builder: (column) => column);
+
+  GeneratedColumn<String> get weakTopics => $composableBuilder(
+      column: $table.weakTopics, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get attemptedAt => $composableBuilder(
+      column: $table.attemptedAt, builder: (column) => column);
+}
+
+class $$QuizAttemptsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $QuizAttemptsTable,
+    QuizAttemptDB,
+    $$QuizAttemptsTableFilterComposer,
+    $$QuizAttemptsTableOrderingComposer,
+    $$QuizAttemptsTableAnnotationComposer,
+    $$QuizAttemptsTableCreateCompanionBuilder,
+    $$QuizAttemptsTableUpdateCompanionBuilder,
+    (
+      QuizAttemptDB,
+      BaseReferences<_$AppDatabase, $QuizAttemptsTable, QuizAttemptDB>
+    ),
+    QuizAttemptDB,
+    PrefetchHooks Function()> {
+  $$QuizAttemptsTableTableManager(_$AppDatabase db, $QuizAttemptsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QuizAttemptsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QuizAttemptsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QuizAttemptsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            Value<String?> lessonRemoteId = const Value.absent(),
+            Value<int> totalQuestions = const Value.absent(),
+            Value<int> correctAnswers = const Value.absent(),
+            Value<int> scorePercent = const Value.absent(),
+            Value<int> earnedXp = const Value.absent(),
+            Value<String> weakTopics = const Value.absent(),
+            Value<DateTime> attemptedAt = const Value.absent(),
+          }) =>
+              QuizAttemptsCompanion(
+            id: id,
+            userId: userId,
+            lessonRemoteId: lessonRemoteId,
+            totalQuestions: totalQuestions,
+            correctAnswers: correctAnswers,
+            scorePercent: scorePercent,
+            earnedXp: earnedXp,
+            weakTopics: weakTopics,
+            attemptedAt: attemptedAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String userId,
+            Value<String?> lessonRemoteId = const Value.absent(),
+            required int totalQuestions,
+            required int correctAnswers,
+            required int scorePercent,
+            required int earnedXp,
+            Value<String> weakTopics = const Value.absent(),
+            required DateTime attemptedAt,
+          }) =>
+              QuizAttemptsCompanion.insert(
+            id: id,
+            userId: userId,
+            lessonRemoteId: lessonRemoteId,
+            totalQuestions: totalQuestions,
+            correctAnswers: correctAnswers,
+            scorePercent: scorePercent,
+            earnedXp: earnedXp,
+            weakTopics: weakTopics,
+            attemptedAt: attemptedAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$QuizAttemptsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $QuizAttemptsTable,
+    QuizAttemptDB,
+    $$QuizAttemptsTableFilterComposer,
+    $$QuizAttemptsTableOrderingComposer,
+    $$QuizAttemptsTableAnnotationComposer,
+    $$QuizAttemptsTableCreateCompanionBuilder,
+    $$QuizAttemptsTableUpdateCompanionBuilder,
+    (
+      QuizAttemptDB,
+      BaseReferences<_$AppDatabase, $QuizAttemptsTable, QuizAttemptDB>
+    ),
+    QuizAttemptDB,
+    PrefetchHooks Function()>;
+typedef $$ChatMessagesLocalTableCreateCompanionBuilder
+    = ChatMessagesLocalCompanion Function({
+  required String id,
+  required String userId,
+  required String role,
+  required String content,
+  required DateTime createdAt,
+  Value<int> rowid,
+});
+typedef $$ChatMessagesLocalTableUpdateCompanionBuilder
+    = ChatMessagesLocalCompanion Function({
+  Value<String> id,
+  Value<String> userId,
+  Value<String> role,
+  Value<String> content,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+class $$ChatMessagesLocalTableFilterComposer
+    extends Composer<_$AppDatabase, $ChatMessagesLocalTable> {
+  $$ChatMessagesLocalTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get role => $composableBuilder(
+      column: $table.role, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$ChatMessagesLocalTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChatMessagesLocalTable> {
+  $$ChatMessagesLocalTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get role => $composableBuilder(
+      column: $table.role, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ChatMessagesLocalTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChatMessagesLocalTable> {
+  $$ChatMessagesLocalTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<String> get role =>
+      $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ChatMessagesLocalTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ChatMessagesLocalTable,
+    ChatMessageDB,
+    $$ChatMessagesLocalTableFilterComposer,
+    $$ChatMessagesLocalTableOrderingComposer,
+    $$ChatMessagesLocalTableAnnotationComposer,
+    $$ChatMessagesLocalTableCreateCompanionBuilder,
+    $$ChatMessagesLocalTableUpdateCompanionBuilder,
+    (
+      ChatMessageDB,
+      BaseReferences<_$AppDatabase, $ChatMessagesLocalTable, ChatMessageDB>
+    ),
+    ChatMessageDB,
+    PrefetchHooks Function()> {
+  $$ChatMessagesLocalTableTableManager(
+      _$AppDatabase db, $ChatMessagesLocalTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ChatMessagesLocalTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChatMessagesLocalTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ChatMessagesLocalTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            Value<String> role = const Value.absent(),
+            Value<String> content = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChatMessagesLocalCompanion(
+            id: id,
+            userId: userId,
+            role: role,
+            content: content,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String userId,
+            required String role,
+            required String content,
+            required DateTime createdAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChatMessagesLocalCompanion.insert(
+            id: id,
+            userId: userId,
+            role: role,
+            content: content,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ChatMessagesLocalTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ChatMessagesLocalTable,
+    ChatMessageDB,
+    $$ChatMessagesLocalTableFilterComposer,
+    $$ChatMessagesLocalTableOrderingComposer,
+    $$ChatMessagesLocalTableAnnotationComposer,
+    $$ChatMessagesLocalTableCreateCompanionBuilder,
+    $$ChatMessagesLocalTableUpdateCompanionBuilder,
+    (
+      ChatMessageDB,
+      BaseReferences<_$AppDatabase, $ChatMessagesLocalTable, ChatMessageDB>
+    ),
+    ChatMessageDB,
+    PrefetchHooks Function()>;
+typedef $$MarchHistoryTableCreateCompanionBuilder = MarchHistoryCompanion
+    Function({
+  Value<int> id,
+  Value<String> userId,
+  required DateTime startedAt,
+  required int totalDurationSeconds,
+  required int successRate,
+  Value<String> weakTopics,
+  Value<String> itemsJson,
+  Value<bool> isDirty,
+  Value<DateTime?> syncedAt,
+});
+typedef $$MarchHistoryTableUpdateCompanionBuilder = MarchHistoryCompanion
+    Function({
+  Value<int> id,
+  Value<String> userId,
+  Value<DateTime> startedAt,
+  Value<int> totalDurationSeconds,
+  Value<int> successRate,
+  Value<String> weakTopics,
+  Value<String> itemsJson,
+  Value<bool> isDirty,
+  Value<DateTime?> syncedAt,
+});
+
+class $$MarchHistoryTableFilterComposer
+    extends Composer<_$AppDatabase, $MarchHistoryTable> {
+  $$MarchHistoryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalDurationSeconds => $composableBuilder(
+      column: $table.totalDurationSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get successRate => $composableBuilder(
+      column: $table.successRate, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get weakTopics => $composableBuilder(
+      column: $table.weakTopics, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get itemsJson => $composableBuilder(
+      column: $table.itemsJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isDirty => $composableBuilder(
+      column: $table.isDirty, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+      column: $table.syncedAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$MarchHistoryTableOrderingComposer
+    extends Composer<_$AppDatabase, $MarchHistoryTable> {
+  $$MarchHistoryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+      column: $table.userId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get totalDurationSeconds => $composableBuilder(
+      column: $table.totalDurationSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get successRate => $composableBuilder(
+      column: $table.successRate, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get weakTopics => $composableBuilder(
+      column: $table.weakTopics, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get itemsJson => $composableBuilder(
+      column: $table.itemsJson, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isDirty => $composableBuilder(
+      column: $table.isDirty, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+      column: $table.syncedAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$MarchHistoryTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MarchHistoryTable> {
+  $$MarchHistoryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get totalDurationSeconds => $composableBuilder(
+      column: $table.totalDurationSeconds, builder: (column) => column);
+
+  GeneratedColumn<int> get successRate => $composableBuilder(
+      column: $table.successRate, builder: (column) => column);
+
+  GeneratedColumn<String> get weakTopics => $composableBuilder(
+      column: $table.weakTopics, builder: (column) => column);
+
+  GeneratedColumn<String> get itemsJson =>
+      $composableBuilder(column: $table.itemsJson, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDirty =>
+      $composableBuilder(column: $table.isDirty, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+}
+
+class $$MarchHistoryTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $MarchHistoryTable,
+    MarchHistoryDB,
+    $$MarchHistoryTableFilterComposer,
+    $$MarchHistoryTableOrderingComposer,
+    $$MarchHistoryTableAnnotationComposer,
+    $$MarchHistoryTableCreateCompanionBuilder,
+    $$MarchHistoryTableUpdateCompanionBuilder,
+    (
+      MarchHistoryDB,
+      BaseReferences<_$AppDatabase, $MarchHistoryTable, MarchHistoryDB>
+    ),
+    MarchHistoryDB,
+    PrefetchHooks Function()> {
+  $$MarchHistoryTableTableManager(_$AppDatabase db, $MarchHistoryTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MarchHistoryTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MarchHistoryTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MarchHistoryTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            Value<DateTime> startedAt = const Value.absent(),
+            Value<int> totalDurationSeconds = const Value.absent(),
+            Value<int> successRate = const Value.absent(),
+            Value<String> weakTopics = const Value.absent(),
+            Value<String> itemsJson = const Value.absent(),
+            Value<bool> isDirty = const Value.absent(),
+            Value<DateTime?> syncedAt = const Value.absent(),
+          }) =>
+              MarchHistoryCompanion(
+            id: id,
+            userId: userId,
+            startedAt: startedAt,
+            totalDurationSeconds: totalDurationSeconds,
+            successRate: successRate,
+            weakTopics: weakTopics,
+            itemsJson: itemsJson,
+            isDirty: isDirty,
+            syncedAt: syncedAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> userId = const Value.absent(),
+            required DateTime startedAt,
+            required int totalDurationSeconds,
+            required int successRate,
+            Value<String> weakTopics = const Value.absent(),
+            Value<String> itemsJson = const Value.absent(),
+            Value<bool> isDirty = const Value.absent(),
+            Value<DateTime?> syncedAt = const Value.absent(),
+          }) =>
+              MarchHistoryCompanion.insert(
+            id: id,
+            userId: userId,
+            startedAt: startedAt,
+            totalDurationSeconds: totalDurationSeconds,
+            successRate: successRate,
+            weakTopics: weakTopics,
+            itemsJson: itemsJson,
+            isDirty: isDirty,
+            syncedAt: syncedAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$MarchHistoryTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $MarchHistoryTable,
+    MarchHistoryDB,
+    $$MarchHistoryTableFilterComposer,
+    $$MarchHistoryTableOrderingComposer,
+    $$MarchHistoryTableAnnotationComposer,
+    $$MarchHistoryTableCreateCompanionBuilder,
+    $$MarchHistoryTableUpdateCompanionBuilder,
+    (
+      MarchHistoryDB,
+      BaseReferences<_$AppDatabase, $MarchHistoryTable, MarchHistoryDB>
+    ),
+    MarchHistoryDB,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2590,4 +4526,10 @@ class $AppDatabaseManager {
       $$LessonsTableTableManager(_db, _db.lessons);
   $$UserProgressTableTableManager get userProgress =>
       $$UserProgressTableTableManager(_db, _db.userProgress);
+  $$QuizAttemptsTableTableManager get quizAttempts =>
+      $$QuizAttemptsTableTableManager(_db, _db.quizAttempts);
+  $$ChatMessagesLocalTableTableManager get chatMessagesLocal =>
+      $$ChatMessagesLocalTableTableManager(_db, _db.chatMessagesLocal);
+  $$MarchHistoryTableTableManager get marchHistory =>
+      $$MarchHistoryTableTableManager(_db, _db.marchHistory);
 }

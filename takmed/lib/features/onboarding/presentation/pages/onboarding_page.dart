@@ -39,7 +39,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
     return BlocConsumer<OnboardingBloc, OnboardingState>(
       listener: (context, state) {
         if (state.status == OnboardingStatus.completed) {
-          context.go(AppRoutes.login);
+          // Онбординг тепер проходиться вже після авторизації —
+          // одразу ведемо на головну.
+          context.go(AppRoutes.home);
         }
         if (state.status == OnboardingStatus.error &&
             state.errorMessage != null) {

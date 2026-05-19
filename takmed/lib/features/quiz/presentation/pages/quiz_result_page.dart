@@ -6,6 +6,7 @@ import '../bloc/quiz_state.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/database/app_database.dart';
+import '../../../../core/database/daos/quiz_attempt_dao.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../gamification/presentation/bloc/gamification_bloc.dart';
 import '../../../gamification/presentation/bloc/gamification_event.dart';
@@ -51,6 +52,8 @@ class _QuizResultPageState extends State<QuizResultPage> {
 
   Future<void> _dispatchGamification() async {
     String courseRemoteId = '';
+    int totalQuizAttempts = 0;
+
     if (widget.courseId != null) {
       try {
         final db = getIt<AppDatabase>();
@@ -58,12 +61,19 @@ class _QuizResultPageState extends State<QuizResultPage> {
         courseRemoteId = course?.remoteId ?? '';
       } catch (_) {}
     }
+
+    try {
+      final dao = getIt<QuizAttemptDao>();
+      totalQuizAttempts = await dao.countAttemptsByUser('');
+    } catch (_) {}
+
     getIt<GamificationBloc>().add(GamificationQuizCompleted(
       totalQuestions: widget.result.totalQuestions,
       correctAnswers: widget.result.correctAnswers,
       earnedXp: widget.result.earnedXp,
       courseRemoteId: courseRemoteId,
       fastAnswerCount: widget.result.fastAnswerCount,
+      totalQuizAttempts: totalQuizAttempts,
     ));
   }
 
@@ -239,7 +249,16 @@ class _QuizResultPageState extends State<QuizResultPage> {
                         child: const Text('Спробувати ще раз',
                             style: TextStyle(fontSize: 16)),
                       ),
-                    ]
+                    ],
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      icon: const Icon(Icons.history, color: AppColors.textSecondary),
+                      label: const Text(
+                        'Історія спроб',
+                        style: TextStyle(color: AppColors.textSecondary),
+                      ),
+                      onPressed: () => context.push(AppRoutes.quizHistory),
+                    ),
                   ],
                 ),
               ),

@@ -29,6 +29,7 @@ class QuestionCard extends StatelessWidget {
               trueFalse: (q) => _buildTextQuestion(context, q.statement, null),
               sequence: (q) => _buildTextQuestion(context, q.instruction, null),
               imageMatch: (q) => _buildTextQuestion(context, q.question, q.imageUrl),
+              multiSelect: (q) => _buildTextQuestion(context, q.text, q.imageUrl),
             ),
           ],
         ),

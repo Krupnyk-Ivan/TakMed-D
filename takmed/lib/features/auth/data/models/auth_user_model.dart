@@ -8,6 +8,7 @@ class AuthUserModel extends AuthUser {
     required super.email,
     required super.name,
     required super.token,
+    super.role = 'student',
   });
 
   /// Створює модель з JSON.
@@ -17,6 +18,7 @@ class AuthUserModel extends AuthUser {
       email: json['email'] as String? ?? '',
       name: json['name'] as String? ?? '',
       token: json['token'] as String? ?? '',
+      role: json['role'] as String? ?? 'student',
     );
   }
 
@@ -27,6 +29,7 @@ class AuthUserModel extends AuthUser {
       'email': email,
       'name': name,
       'token': token,
+      'role': role,
     };
   }
 }

@@ -79,7 +79,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         profileData =
             await _supabaseClient
                 .from('profiles')
-                .select('name')
+                .select('name, role')
                 .eq('id', user.id)
                 .maybeSingle();
       } on supabase.PostgrestException catch (e) {
@@ -93,6 +93,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         email: user.email ?? '',
         name: profileData?['name'] as String? ?? _fallbackName(user),
         token: response.session?.accessToken ?? '',
+        role: profileData?['role'] as String? ?? 'student',
       );
     } on supabase.AuthException catch (e) {
       throw AppAuthException(message: e.message);
@@ -199,7 +200,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         profileData =
             await _supabaseClient
                 .from('profiles')
-                .select('name')
+                .select('name, role')
                 .eq('id', user.id)
                 .maybeSingle();
       } on supabase.PostgrestException catch (e) {
@@ -213,6 +214,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         email: user.email ?? '',
         name: profileData?['name'] as String? ?? _fallbackName(user),
         token: response.session?.accessToken ?? '',
+        role: profileData?['role'] as String? ?? 'student',
       );
     } on supabase.AuthException catch (e) {
       throw AppAuthException(message: e.message);

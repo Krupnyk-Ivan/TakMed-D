@@ -15,7 +15,7 @@ import '../../domain/repositories/learning_repository.dart';
 import '../../../../features/gamification/presentation/bloc/gamification_bloc.dart';
 import '../../../../features/gamification/presentation/bloc/gamification_event.dart';
 import '../../../../features/gamification/presentation/bloc/gamification_state.dart';
-import '../../../../features/march/presentation/pages/march_checklist_page.dart';
+import '../../../../features/march_educational/presentation/pages/march_educational_page.dart';
 import '../../../../features/quiz/presentation/pages/quiz_page.dart';
 import 'generic_checklist_page.dart';
 
@@ -196,7 +196,8 @@ class _TheoryLessonPageState extends State<TheoryLessonPage> {
   }
 
   /// Парсить ChecklistContent та роутить до потрібної сторінки:
-  /// • MARCH-чеклист (5 кроків M/A/R/C/H) → [MarchChecklistPage]
+  /// • MARCH-чеклист (5 кроків M/A/R/C/H) → [MarchEducationalPage]
+  ///   (тренувальний режим з мікро-квізами після кожного кроку)
   /// • Решта → [GenericChecklistPage]
   Widget _buildChecklistPage(BuildContext context) {
     ChecklistContent? content;
@@ -207,10 +208,8 @@ class _TheoryLessonPageState extends State<TheoryLessonPage> {
       content = const ChecklistContent(steps: []);
     }
 
-    final isMarch = _isMarchChecklist(content);
-
-    if (isMarch) {
-      return MarchChecklistPage(lesson: _lesson!, content: content);
+    if (_isMarchChecklist(content)) {
+      return const MarchEducationalPage();
     }
     return GenericChecklistPage(lesson: _lesson!, content: content);
   }

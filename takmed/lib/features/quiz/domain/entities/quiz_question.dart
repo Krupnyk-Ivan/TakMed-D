@@ -47,6 +47,17 @@ class QuizQuestion with _$QuizQuestion {
     required String explanation,
   }) = ImageMatchQuestion;
 
+  // Тип 5: Multi-Select (кілька правильних відповідей)
+  const factory QuizQuestion.multiSelect({
+    required String id,
+    required String text,
+    @Default([]) List<String> tags,
+    String? imageUrl,
+    required List<AnswerOption> options,
+    required List<String> correctIds,
+    required String explanation,
+  }) = MultiSelectQuestion;
+
   factory QuizQuestion.fromJson(Map<String, dynamic> json) =>
       _$QuizQuestionFromJson(json);
 }

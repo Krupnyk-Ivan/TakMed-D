@@ -16,6 +16,9 @@ enum SplashStatus {
 
   /// Перенаправлення на логін.
   navigateToLogin,
+
+  /// Перенаправлення на адмін-панель.
+  navigateToAdmin,
 }
 
 /// Стан splash screen.

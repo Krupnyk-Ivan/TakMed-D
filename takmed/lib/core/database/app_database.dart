@@ -3,17 +3,37 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'tables/courses_table.dart';
 import 'tables/lessons_table.dart';
 import 'tables/user_progress_table.dart';
+import 'tables/quiz_attempts_table.dart';
+import 'tables/chat_messages_table.dart';
+import 'tables/march_history_table.dart';
 import 'daos/course_dao.dart';
 import 'daos/lesson_dao.dart';
 import 'daos/progress_dao.dart';
+import 'daos/quiz_attempt_dao.dart';
+import 'daos/chat_dao.dart';
+import 'daos/march_history_dao.dart';
 import 'seed_data.dart';
 
 part 'app_database.g.dart';
 
 /// Головна база даних TacMed (Drift / SQLite).
 @DriftDatabase(
-  tables: [Courses, Lessons, UserProgress],
-  daos: [CourseDao, LessonDao, ProgressDao],
+  tables: [
+    Courses,
+    Lessons,
+    UserProgress,
+    QuizAttempts,
+    ChatMessagesLocal,
+    MarchHistory,
+  ],
+  daos: [
+    CourseDao,
+    LessonDao,
+    ProgressDao,
+    QuizAttemptDao,
+    ChatDao,
+    MarchHistoryDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   /// Створює production database.
@@ -23,7 +43,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -33,6 +53,24 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (m, from, to) async {
       if (from < 2) {
         await _migrateToV2(m);
+      }
+      if (from < 3) {
+        // Видаляємо seed-курси — дані тепер беруться виключно з Supabase.
+        await customStatement(
+          "DELETE FROM lessons WHERE remote_id LIKE 'mil-%' OR remote_id LIKE 'civ-%' OR remote_id LIKE 'exam-%' OR remote_id LIKE 'march-%'",
+        );
+        await customStatement(
+          "DELETE FROM courses WHERE remote_id LIKE 'mil-%' OR remote_id LIKE 'civ-%' OR remote_id LIKE 'exam-%'",
+        );
+      }
+      if (from < 4) {
+        await m.createTable(quizAttempts);
+      }
+      if (from < 5) {
+        await m.createTable(chatMessagesLocal);
+      }
+      if (from < 6) {
+        await m.createTable(marchHistory);
       }
     },
     beforeOpen: (details) async {

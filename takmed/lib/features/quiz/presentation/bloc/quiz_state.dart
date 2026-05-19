@@ -22,6 +22,8 @@ class QuizInProgress extends QuizState {
   final int score;
   final List<String> weakTopics;
   final int fastAnswerCount;
+  // Для multi-select — поточний вибір до підтвердження
+  final List<String> pendingSelectedIds;
 
   const QuizInProgress({
     required this.questions,
@@ -29,12 +31,20 @@ class QuizInProgress extends QuizState {
     required this.score,
     required this.weakTopics,
     this.fastAnswerCount = 0,
+    this.pendingSelectedIds = const [],
   });
 
   QuizQuestion get currentQuestion => questions[currentIndex];
 
   @override
-  List<Object?> get props => [questions, currentIndex, score, weakTopics, fastAnswerCount];
+  List<Object?> get props => [
+        questions,
+        currentIndex,
+        score,
+        weakTopics,
+        fastAnswerCount,
+        pendingSelectedIds,
+      ];
 
   QuizInProgress copyWith({
     List<QuizQuestion>? questions,
@@ -42,6 +52,7 @@ class QuizInProgress extends QuizState {
     int? score,
     List<String>? weakTopics,
     int? fastAnswerCount,
+    List<String>? pendingSelectedIds,
   }) {
     return QuizInProgress(
       questions: questions ?? this.questions,
@@ -49,6 +60,7 @@ class QuizInProgress extends QuizState {
       score: score ?? this.score,
       weakTopics: weakTopics ?? this.weakTopics,
       fastAnswerCount: fastAnswerCount ?? this.fastAnswerCount,
+      pendingSelectedIds: pendingSelectedIds ?? this.pendingSelectedIds,
     );
   }
 }
@@ -57,15 +69,23 @@ class QuizAnswered extends QuizState {
   final QuizInProgress progressState;
   final bool isCorrect;
   final String selectedAnswerId;
+  // Для multi-select — всі вибрані id
+  final List<String> selectedAnswerIds;
 
   const QuizAnswered({
     required this.progressState,
     required this.isCorrect,
     required this.selectedAnswerId,
+    this.selectedAnswerIds = const [],
   });
 
   @override
-  List<Object?> get props => [progressState, isCorrect, selectedAnswerId];
+  List<Object?> get props => [
+        progressState,
+        isCorrect,
+        selectedAnswerId,
+        selectedAnswerIds,
+      ];
 }
 
 class QuizCompleted extends QuizState {

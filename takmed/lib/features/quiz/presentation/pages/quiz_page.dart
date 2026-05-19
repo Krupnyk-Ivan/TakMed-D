@@ -9,7 +9,10 @@ import '../widgets/question_card.dart';
 import '../widgets/answer_button.dart';
 import '../widgets/sequence_drag_widget.dart';
 import '../widgets/explanation_panel.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/di/injection_container.dart';
+import '../../domain/entities/quiz_question.dart';
 
 class QuizPage extends StatelessWidget {
   final int? lessonId;
@@ -41,30 +44,7 @@ class _QuizView extends StatelessWidget {
         title: const Text('Вікторина'),
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () {
-            // Confirm exit
-            showDialog(
-              context: context,
-              builder:
-                  (ctx) => AlertDialog(
-                    title: const Text('Вийти з тесту?'),
-                    content: const Text('Ваш прогрес буде втрачено.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('Скасувати'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(ctx).pop();
-                          context.pop();
-                        },
-                        child: const Text('Вийти'),
-                      ),
-                    ],
-                  ),
-            );
-          },
+          onPressed: () => _confirmExit(context),
         ),
       ),
       body: BlocConsumer<QuizBloc, QuizState>(
@@ -156,10 +136,8 @@ class _QuizView extends StatelessWidget {
                                     answeredState?.selectedAnswerId == opt.id;
                                 bool? isCorrect;
                                 if (isAnswered) {
-                                  if (isSelected)
-                                    isCorrect = answeredState.isCorrect;
-                                  if (opt.id == q.correctId)
-                                    isCorrect = true; // highlight correct
+                                  if (isSelected) { isCorrect = answeredState.isCorrect; }
+                                  if (opt.id == q.correctId) { isCorrect = true; }
                                 }
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12),
@@ -176,6 +154,12 @@ class _QuizView extends StatelessWidget {
                                   ),
                                 );
                               }).toList(),
+                        ),
+                    multiSelect:
+                        (q) => _MultiSelectWidget(
+                          question: q,
+                          state: state,
+                          answeredState: answeredState,
                         ),
                     trueFalse:
                         (q) => Column(
@@ -267,9 +251,8 @@ class _QuizView extends StatelessWidget {
                                     answeredState?.selectedAnswerId == opt.id;
                                 bool? isCorrect;
                                 if (isAnswered) {
-                                  if (isSelected)
-                                    isCorrect = answeredState.isCorrect;
-                                  if (opt.id == q.correctId) isCorrect = true;
+                                  if (isSelected) { isCorrect = answeredState.isCorrect; }
+                                  if (opt.id == q.correctId) { isCorrect = true; }
                                 }
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 12),
@@ -294,6 +277,178 @@ class _QuizView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _confirmExit(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Вийти з тесту?'),
+        content: const Text('Ваш прогрес буде втрачено.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Скасувати'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              // Quiz відкривається як root-маршрут (`context.go('/quiz')`),
+              // тож стек може бути порожнім — використовуємо безпечний fallback.
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            },
+            child: const Text('Вийти'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MultiSelectWidget extends StatelessWidget {
+  const _MultiSelectWidget({
+    required this.question,
+    required this.state,
+    required this.answeredState,
+  });
+
+  final MultiSelectQuestion question;
+  final QuizInProgress state;
+  final QuizAnswered? answeredState;
+
+  @override
+  Widget build(BuildContext context) {
+    final isAnswered = answeredState != null;
+    final selectedIds = isAnswered
+        ? answeredState!.selectedAnswerIds
+        : state.pendingSelectedIds;
+    final correctIds = Set<String>.from(question.correctIds);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Text(
+            'Оберіть усі правильні відповіді',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: AppDimensions.fontSizeMedium,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+        ...question.options.map((opt) {
+          final isSelected = selectedIds.contains(opt.id);
+          final isCorrectOption = correctIds.contains(opt.id);
+
+          Color borderColor = AppColors.borderColor;
+          Color bgColor = Colors.transparent;
+          Color textColor = AppColors.textPrimary;
+          Widget? trailingIcon;
+
+          if (isAnswered) {
+            if (isCorrectOption) {
+              borderColor = AppColors.accentGreen;
+              bgColor = AppColors.accentGreen.withValues(alpha: 0.15);
+              trailingIcon = const Icon(Icons.check_circle, color: AppColors.accentGreen);
+            } else if (isSelected && !isCorrectOption) {
+              borderColor = AppColors.errorRed;
+              bgColor = AppColors.errorRed.withValues(alpha: 0.15);
+              trailingIcon = const Icon(Icons.cancel, color: AppColors.errorRed);
+            }
+          } else if (isSelected) {
+            borderColor = AppColors.primaryRed;
+            bgColor = AppColors.primaryRed.withValues(alpha: 0.15);
+          }
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: InkWell(
+              onTap: isAnswered
+                  ? null
+                  : () => context.read<QuizBloc>().add(MultiSelectToggled(opt.id)),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+              child: AnimatedContainer(
+                duration: AppDimensions.animationShort,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimensions.paddingLarge,
+                  vertical: AppDimensions.paddingMedium,
+                ),
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  border: Border.all(color: borderColor, width: 2),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+                ),
+                child: Row(
+                  children: [
+                    AnimatedContainer(
+                      duration: AppDimensions.animationShort,
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: isSelected && !isAnswered
+                            ? AppColors.primaryRed
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: isSelected && !isAnswered
+                              ? AppColors.primaryRed
+                              : AppColors.borderColor,
+                          width: 2,
+                        ),
+                      ),
+                      child: isSelected && !isAnswered
+                          ? const Icon(Icons.check, size: 14, color: Colors.white)
+                          : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        opt.text,
+                        style: TextStyle(
+                          fontSize: AppDimensions.fontSizeBase,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                    if (trailingIcon != null) trailingIcon,
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
+        if (!isAnswered) ...[
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: state.pendingSelectedIds.isEmpty
+                    ? AppColors.borderColor
+                    : AppColors.primaryRed,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
+                ),
+              ),
+              onPressed: state.pendingSelectedIds.isEmpty
+                  ? null
+                  : () => context.read<QuizBloc>().add(const SubmitMultiSelect()),
+              child: const Text(
+                'Підтвердити відповідь',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

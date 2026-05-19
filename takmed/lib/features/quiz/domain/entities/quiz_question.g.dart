@@ -115,3 +115,35 @@ Map<String, dynamic> _$$ImageMatchQuestionImplToJson(
       'explanation': instance.explanation,
       'runtimeType': instance.$type,
     };
+
+_$MultiSelectQuestionImpl _$$MultiSelectQuestionImplFromJson(
+        Map<String, dynamic> json) =>
+    _$MultiSelectQuestionImpl(
+      id: json['id'] as String,
+      text: json['text'] as String,
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+              const [],
+      imageUrl: json['imageUrl'] as String?,
+      options: (json['options'] as List<dynamic>)
+          .map((e) => AnswerOption.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      correctIds: (json['correctIds'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      explanation: json['explanation'] as String,
+      $type: json['runtimeType'] as String?,
+    );
+
+Map<String, dynamic> _$$MultiSelectQuestionImplToJson(
+        _$MultiSelectQuestionImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'text': instance.text,
+      'tags': instance.tags,
+      'imageUrl': instance.imageUrl,
+      'options': instance.options,
+      'correctIds': instance.correctIds,
+      'explanation': instance.explanation,
+      'runtimeType': instance.$type,
+    };

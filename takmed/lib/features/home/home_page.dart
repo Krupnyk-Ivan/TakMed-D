@@ -50,26 +50,9 @@ class HomePage extends StatelessWidget {
                   ),
                   if (state.nextLesson != null)
                     SliverToBoxAdapter(child: _buildNextLessonCard(context, state)),
-                  SliverToBoxAdapter(child: _buildMarchChecklistCard(context)),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
-                      child: Text('Модулі',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge
-                              ?.copyWith(fontWeight: FontWeight.bold)),
-                    ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    sliver: SliverList.separated(
-                      itemCount: state.courses.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) =>
-                          _buildCourseCard(context, state, index),
-                    ),
-                  ),
+                  SliverToBoxAdapter(child: _buildMarchTrainingCard(context)),
+                  SliverToBoxAdapter(child: _buildAiChatCard(context)),
+                  SliverToBoxAdapter(child: _buildAllCoursesLink(context, state)),
                   const SliverToBoxAdapter(child: SizedBox(height: 32)),
                 ],
               ),
@@ -182,50 +165,52 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildMarchChecklistCard(BuildContext context) {
+  Widget _buildMarchTrainingCard(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: GestureDetector(
-        onTap: () => context.push(AppRoutes.marchChecklist),
+        onTap: () => context.push(AppRoutes.marchEducational),
         child: Container(
           padding: const EdgeInsets.all(AppDimensions.paddingXLarge),
           decoration: BoxDecoration(
             color: AppColors.cardColor,
             borderRadius: BorderRadius.circular(AppDimensions.radiusXLarge),
-            border: Border.all(color: AppColors.primaryRed.withOpacity(0.5)),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryRed.withOpacity(0.1),
-                blurRadius: 8,
-                spreadRadius: 2,
-              ),
-            ],
+            border: Border.all(
+              color: AppColors.warningOrange.withValues(alpha: 0.4),
+            ),
           ),
           child: Row(children: [
             Container(
-              width: 48, height: 48,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
-                color: AppColors.primaryRed.withOpacity(0.2),
+                color: AppColors.warningOrange.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Center(
-                  child: Icon(Icons.medical_services, color: AppColors.primaryRed, size: 28)),
+                child: Icon(Icons.school_outlined,
+                    color: AppColors.warningOrange, size: 26),
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Практика',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.primaryRed,
-                          fontWeight: FontWeight.w600)),
+                  Text(
+                    'Тренування',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.warningOrange,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
                   const SizedBox(height: 4),
-                  Text('Протокол MARCH',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    'MARCH-симулятор з мікро-квізами',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
                 ],
               ),
             ),
@@ -237,71 +222,115 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildCourseCard(BuildContext context, HomeState state, int index) {
-    final course = state.courses[index];
-    return GestureDetector(
-      onTap: () => context.go('/course/${course.id}'),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.paddingXLarge),
-        decoration: BoxDecoration(
-          color: AppColors.cardColor,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusXLarge),
-          border: Border.all(color: AppColors.borderColor),
+  Widget _buildAiChatCard(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      child: GestureDetector(
+        onTap: () => context.push(AppRoutes.aiChat),
+        child: Container(
+          padding: const EdgeInsets.all(AppDimensions.paddingXLarge),
+          decoration: BoxDecoration(
+            color: AppColors.cardColor,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXLarge),
+            border: Border.all(
+              color: AppColors.accentGreen.withValues(alpha: 0.4),
+            ),
+          ),
+          child: Row(children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.accentGreen.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(
+                child: Icon(Icons.auto_awesome,
+                    color: AppColors.accentGreen, size: 26),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('ШІ-помічник',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.accentGreen,
+                            fontWeight: FontWeight.w600,
+                          )),
+                  const SizedBox(height: 4),
+                  Text('Питай про MARCH, TCCC, першу допомогу',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          )),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios,
+                color: AppColors.textSecondary, size: 16),
+          ]),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(
-              child: Text(course.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-            ),
-            if (course.isDownloaded)
-              const Icon(Icons.download_done,
-                  color: AppColors.accentGreen, size: 20)
-            else
-              GestureDetector(
-                onTap: () => context
-                    .read<HomeBloc>()
-                    .add(HomeDownloadCourseRequested(course.id)),
-                child: const Icon(Icons.download_for_offline_outlined,
-                    color: AppColors.textSecondary, size: 20),
+      ),
+    );
+  }
+
+  Widget _buildAllCoursesLink(BuildContext context, HomeState state) {
+    final totalCourses = state.courses.length;
+    final completed = state.courses.where((c) => c.isCompleted).length;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      child: GestureDetector(
+        onTap: () => context.go(AppRoutes.learning),
+        child: Container(
+          padding: const EdgeInsets.all(AppDimensions.paddingXLarge),
+          decoration: BoxDecoration(
+            color: AppColors.cardColor,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusXLarge),
+            border: Border.all(color: AppColors.borderColor),
+          ),
+          child: Row(children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.accentGreen.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
               ),
-          ]),
-          const SizedBox(height: 6),
-          Text(course.description,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: AppColors.textSecondary),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 12),
-          Row(children: [
+              child: const Center(
+                child: Icon(Icons.library_books_outlined,
+                    color: AppColors.accentGreen, size: 26),
+              ),
+            ),
+            const SizedBox(width: 14),
             Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: course.progressPercent,
-                  backgroundColor: AppColors.borderColor,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    course.isCompleted
-                        ? AppColors.accentGreen
-                        : AppColors.primaryRed,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Каталог курсів',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                  minHeight: 6,
-                ),
+                  const SizedBox(height: 2),
+                  Text(
+                    totalCourses == 0
+                        ? 'Курси для твого треку ще додають'
+                        : 'Пройдено $completed з $totalCourses',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: AppColors.textSecondary),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 10),
-            Text('${course.completedLessons}/${course.totalLessons}',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: AppColors.textSecondary)),
+            const Icon(Icons.arrow_forward_ios,
+                color: AppColors.textSecondary, size: 16),
           ]),
-        ]),
+        ),
       ),
     );
   }

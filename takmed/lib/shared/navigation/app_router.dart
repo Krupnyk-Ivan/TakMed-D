@@ -15,12 +15,23 @@ import '../../features/quiz/presentation/pages/quiz_page.dart';
 import '../../features/quiz/presentation/pages/quiz_result_page.dart';
 import '../../features/quiz/presentation/bloc/quiz_state.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
-import '../../features/march/presentation/pages/march_checklist_page.dart';
+import '../../features/quiz/presentation/pages/quiz_history_page.dart';
+import '../../features/march_educational/presentation/pages/march_educational_page.dart';
+import '../../admin/presentation/pages/admin_layout.dart';
+import '../../admin/presentation/pages/admin_dashboard_page.dart';
+import '../../admin/presentation/pages/course_editor_page.dart';
+import '../../admin/presentation/pages/lesson_editor_page.dart';
+import '../../admin/presentation/pages/lessons_list_page.dart';
+import '../../features/learning/learning_page.dart';
+import '../widgets/app_shell_layout.dart';
 
 /// Конфігурація маршрутизації застосунку TacMed.
 class AppRouter {
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
   /// Єдиний екземпляр роутера.
   static final GoRouter router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     routes: <RouteBase>[
       // Splash screen
@@ -37,12 +48,72 @@ class AppRouter {
           key: state.pageKey, child: const OnboardingPage(),
         ),
       ),
-      // Головна
-      GoRoute(
-        path: AppRoutes.home,
-        pageBuilder: (context, state) => _fadeTransitionPage(
-          key: state.pageKey, child: const HomePage(),
-        ),
+      // — Основні 5 вкладок BottomNav через StatefulShellRoute —
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            AppShellLayout(navigationShell: navigationShell),
+        branches: [
+          // 1. Головна
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                pageBuilder: (context, state) => _noTransitionPage(
+                  key: state.pageKey,
+                  child: const HomePage(),
+                ),
+              ),
+            ],
+          ),
+          // 2. Навчання — каталог курсів
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.learning,
+                pageBuilder: (context, state) => _noTransitionPage(
+                  key: state.pageKey,
+                  child: const LearningPage(),
+                ),
+              ),
+            ],
+          ),
+          // 3. MARCH тренування (освітній режим)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.marchEducational,
+                pageBuilder: (context, state) => _noTransitionPage(
+                  key: state.pageKey,
+                  child: const MarchEducationalPage(),
+                ),
+              ),
+            ],
+          ),
+          // 4. Гейміфікація
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.gamification,
+                pageBuilder: (context, state) => _noTransitionPage(
+                  key: state.pageKey,
+                  child: const GamificationPage(),
+                ),
+              ),
+            ],
+          ),
+          // 5. Профіль
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                pageBuilder: (context, state) => _noTransitionPage(
+                  key: state.pageKey,
+                  child: const ProfilePage(),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       // Авторизація
       GoRoute(
@@ -118,26 +189,58 @@ class AppRouter {
           key: state.pageKey, child: const AiChatPage(),
         ),
       ),
-      // Гейміфікація
+      // Історія тестів
       GoRoute(
-        path: AppRoutes.gamification,
+        path: AppRoutes.quizHistory,
         pageBuilder: (context, state) => _fadeTransitionPage(
-          key: state.pageKey, child: const GamificationPage(),
+          key: state.pageKey, child: const QuizHistoryPage(),
         ),
       ),
-      // Профіль
+      // MARCH тренувальний режим
       GoRoute(
-        path: AppRoutes.profile,
+        path: AppRoutes.marchEducational,
         pageBuilder: (context, state) => _fadeTransitionPage(
-          key: state.pageKey, child: const ProfilePage(),
+          key: state.pageKey, child: const MarchEducationalPage(),
         ),
       ),
-      // MARCH чекліст
+      // — Адмін-панель —
       GoRoute(
-        path: AppRoutes.marchChecklist,
+        path: '/admin/dashboard',
         pageBuilder: (context, state) => _fadeTransitionPage(
-          key: state.pageKey, child: const MarchChecklistPage(),
+          key: state.pageKey,
+          child: const AdminLayout(child: AdminDashboardPage()),
         ),
+      ),
+      GoRoute(
+        path: '/admin/editor/course/:id/lessons',
+        pageBuilder: (context, state) {
+          final courseId = state.pathParameters['id'] ?? '';
+          return _fadeTransitionPage(
+            key: state.pageKey,
+            child: AdminLayout(child: LessonsListPage(courseId: courseId)),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/admin/editor/course/:id',
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id'] ?? 'new';
+          return _fadeTransitionPage(
+            key: state.pageKey,
+            child: AdminLayout(child: CourseEditorPage(courseId: id)),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/admin/editor/lesson/:id',
+        pageBuilder: (context, state) {
+          final id = state.pathParameters['id'] ?? 'new';
+          final courseId = state.uri.queryParameters['courseId'] ?? '';
+          return _fadeTransitionPage(
+            key: state.pageKey,
+            child: AdminLayout(child: LessonEditorPage(lessonId: id, courseId: courseId)),
+          );
+        },
       ),
     ],
   );
@@ -154,5 +257,13 @@ class AppRouter {
         return FadeTransition(opacity: animation, child: child);
       },
     );
+  }
+
+  /// Без анімації — для перемикання вкладок у BottomNav.
+  static NoTransitionPage<void> _noTransitionPage({
+    required LocalKey key,
+    required Widget child,
+  }) {
+    return NoTransitionPage<void>(key: key, child: child);
   }
 }

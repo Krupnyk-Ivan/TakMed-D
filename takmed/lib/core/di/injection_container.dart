@@ -27,6 +27,25 @@ import '../../features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import '../../features/quiz/data/repositories/quiz_repository.dart';
 import '../../features/quiz/presentation/bloc/quiz_bloc.dart';
 import '../database/daos/progress_dao.dart';
+import '../database/daos/quiz_attempt_dao.dart';
+import '../database/daos/chat_dao.dart';
+import '../database/daos/march_history_dao.dart';
+import '../../features/march_educational/data/repositories/march_repository_impl.dart';
+import '../../features/march_educational/domain/repositories/march_repository.dart';
+import '../../features/march_educational/presentation/bloc/march_educational_bloc.dart';
+import '../../features/ai_chat/data/datasources/chat_local_data_source.dart';
+import '../../features/ai_chat/data/datasources/chat_remote_data_source.dart';
+import '../../features/ai_chat/data/repositories/chat_repository_impl.dart';
+import '../../features/ai_chat/domain/repositories/chat_repository.dart';
+import '../../features/ai_chat/domain/usecases/get_chat_history_use_case.dart';
+import '../../features/ai_chat/domain/usecases/send_chat_message_use_case.dart';
+import '../../features/ai_chat/presentation/bloc/chat_bloc.dart';
+import '../../features/profile/data/datasources/profile_remote_data_source.dart';
+import '../../features/profile/data/repositories/profile_repository_impl.dart';
+import '../../features/profile/domain/repositories/profile_repository.dart';
+import '../../features/profile/domain/usecases/get_profile_use_case.dart';
+import '../../features/profile/domain/usecases/update_profile_use_case.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
 import '../../features/splash/presentation/bloc/splash_bloc.dart';
 import '../../features/learning/domain/repositories/learning_repository.dart';
 import '../../features/learning/data/datasources/learning_remote_data_source.dart';
@@ -65,6 +84,9 @@ Future<void> setupServiceLocator() async {
   final appDatabase = AppDatabase();
   getIt.registerSingleton<AppDatabase>(appDatabase);
   getIt.registerSingleton<ProgressDao>(appDatabase.progressDao);
+  getIt.registerSingleton<QuizAttemptDao>(appDatabase.quizAttemptDao);
+  getIt.registerSingleton<ChatDao>(appDatabase.chatDao);
+  getIt.registerSingleton<MarchHistoryDao>(appDatabase.marchHistoryDao);
 
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
@@ -98,8 +120,24 @@ Future<void> setupServiceLocator() async {
   setupGamificationDI();
   setupLearningDI();
   setupQuizDI();
+  setupProfileDI();
+  setupAiChatDI();
+  setupMarchEducationalDI();
 
-  await appDatabase.seedIfEmpty();
+  // Тимчасово: заповнюємо локальну базу seed даними, щоб можна було тестувати
+  // мобільний застосунок, поки адмін-панель не наповнить Supabase даними.
+  await getIt<LearningRepository>().seedIfEmpty();
+
+  // Скидаємо lastSync щоб при першому запуску після міграції підтягнулись всі курси.
+  const syncResetDoneKey = 'sync_reset_v3_done';
+  final prefs = getIt<SharedPreferences>();
+  if (prefs.getBool(syncResetDoneKey) != true) {
+    final syncKeys = prefs.getKeys().where((k) => k.startsWith('learning_last_sync_')).toList();
+    for (final key in syncKeys) {
+      await prefs.remove(key);
+    }
+    await prefs.setBool(syncResetDoneKey, true);
+  }
 
   // Ініціалізуємо notification plugin після реєстрації сервісів
   try {
@@ -260,10 +298,80 @@ void setupQuizDI() {
     () => QuizRepository(getIt<AppDatabase>()),
   );
   getIt.registerFactory<QuizBloc>(
-    () => QuizBloc(getIt<QuizRepository>(), getIt<ProgressDao>()),
+    () => QuizBloc(
+      getIt<QuizRepository>(),
+      getIt<ProgressDao>(),
+      getIt<QuizAttemptDao>(),
+      getIt<supabase.SupabaseClient>(),
+    ),
   );
 }
 
-void setupAiChatDI() {}
+void setupAiChatDI() {
+  getIt.registerLazySingleton<ChatRemoteDataSource>(
+    () => ChatRemoteDataSourceImpl(getIt<supabase.SupabaseClient>()),
+  );
+  getIt.registerLazySingleton<ChatLocalDataSource>(
+    () => ChatLocalDataSourceImpl(getIt<ChatDao>()),
+  );
+  getIt.registerLazySingleton<ChatRepository>(
+    () => ChatRepositoryImpl(
+      getIt<ChatRemoteDataSource>(),
+      getIt<ChatLocalDataSource>(),
+      getIt<supabase.SupabaseClient>(),
+    ),
+  );
+  getIt.registerLazySingleton<GetChatHistoryUseCase>(
+    () => GetChatHistoryUseCase(getIt<ChatRepository>()),
+  );
+  getIt.registerLazySingleton<SendChatMessageUseCase>(
+    () => SendChatMessageUseCase(getIt<ChatRepository>()),
+  );
+  getIt.registerFactory<ChatBloc>(
+    () => ChatBloc(
+      getIt<GetChatHistoryUseCase>(),
+      getIt<SendChatMessageUseCase>(),
+    ),
+  );
+}
 
-void setupProfileDI() {}
+void setupMarchEducationalDI() {
+  getIt.registerLazySingleton<MarchRepository>(
+    () => MarchRepositoryImpl(
+      getIt<MarchHistoryDao>(),
+      getIt<supabase.SupabaseClient>(),
+    ),
+  );
+  getIt.registerFactory<MarchEducationalBloc>(
+    () => MarchEducationalBloc(
+      getIt<MarchRepository>(),
+      getIt<GamificationService>(),
+    ),
+  );
+}
+
+void setupProfileDI() {
+  getIt.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(getIt<supabase.SupabaseClient>()),
+  );
+  getIt.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(getIt<ProfileRemoteDataSource>()),
+  );
+  getIt.registerLazySingleton<GetProfileUseCase>(
+    () => GetProfileUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerLazySingleton<UpdateProfileUseCase>(
+    () => UpdateProfileUseCase(getIt<ProfileRepository>()),
+  );
+  getIt.registerFactory<ProfileBloc>(
+    () => ProfileBloc(
+      getIt<GetProfileUseCase>(),
+      getIt<UpdateProfileUseCase>(),
+      getIt<AppDatabase>().lessonDao,
+      getIt<QuizAttemptDao>(),
+      getIt<GamificationService>(),
+      getIt<StreakService>(),
+      getIt<supabase.SupabaseClient>(),
+    ),
+  );
+}

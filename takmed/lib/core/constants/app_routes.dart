@@ -21,7 +21,7 @@ class AppRoutes {
   /// Екран авторизації (redirect на login).
   static const String auth = '/auth';
 
-  /// Екран навчання.
+  /// Екран навчання (вкладка BottomNav: повний каталог курсів).
   static const String learning = '/learning';
 
   /// Деталі курсу.
@@ -44,4 +44,24 @@ class AppRoutes {
 
   /// Екран чекліста MARCH.
   static const String marchChecklist = '/march-checklist';
+
+  /// Історія спроб тестів.
+  static const String quizHistory = '/quiz/history';
+
+  /// Освітній (тренувальний) режим MARCH.
+  static const String marchEducational = '/march-educational';
+
+  // — Адмін-панель —
+
+  /// Головна адмін-панелі.
+  static const String adminDashboard = '/admin/dashboard';
+
+  /// Редактор курсу.
+  static const String adminCourseEditor = '/admin/editor/course/:id';
+
+  /// Список уроків курсу.
+  static const String adminLessonsList = '/admin/editor/course/:id/lessons';
+
+  /// Редактор уроку.
+  static const String adminLessonEditor = '/admin/editor/lesson/:id';
 }

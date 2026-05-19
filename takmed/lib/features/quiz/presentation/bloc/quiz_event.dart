@@ -31,6 +31,20 @@ class SequenceReordered extends QuizEvent {
   List<Object?> get props => [reorderedItemIds];
 }
 
+/// Перемикає вибір одного варіанта у multi-select питанні.
+class MultiSelectToggled extends QuizEvent {
+  final String optionId;
+  const MultiSelectToggled(this.optionId);
+
+  @override
+  List<Object?> get props => [optionId];
+}
+
+/// Підтверджує відповідь у multi-select питанні.
+class SubmitMultiSelect extends QuizEvent {
+  const SubmitMultiSelect();
+}
+
 class NextQuestion extends QuizEvent {
   const NextQuestion();
 }

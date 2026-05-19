@@ -5,14 +5,28 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../onboarding/domain/repositories/onboarding_repository.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 
+/// Після успішної авторизації — якщо онбординг ще не пройдений, ведемо туди;
+/// інакше — на головну.
+Future<void> _goAfterAuth(BuildContext context) async {
+  final completed =
+      await getIt<OnboardingRepository>().isOnboardingCompleted();
+  if (!context.mounted) return;
+  context.go(completed ? AppRoutes.home : AppRoutes.onboarding);
+}
+
 /// Екран входу користувача.
 class LoginPage extends StatelessWidget {
   /// Створює екран входу.
-  const LoginPage({super.key});
+  const LoginPage({super.key, this.isAdminMode = false});
+
+  /// Чи відображається сторінка в режимі адмін-панелі.
+  final bool isAdminMode;
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +38,23 @@ class LoginPage extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text(AppStrings.signInSuccess)),
             );
-            context.go(AppRoutes.home);
+            if (state.user?.role == 'admin') {
+              context.go(AppRoutes.adminDashboard);
+            } else {
+              _goAfterAuth(context);
+            }
           } else if (state.status == AuthStatus.guest) {
-            context.go(AppRoutes.home);
+            if (isAdminMode) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Гостьовий вхід заборонений для адмін-панелі.'),
+                  backgroundColor: AppColors.errorRed,
+                ),
+              );
+              context.read<AuthBloc>().add(const AuthResetFormFields());
+            } else {
+              _goAfterAuth(context);
+            }
           } else if (state.status == AuthStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -146,46 +174,49 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppDimensions.spacerMedium),
-                    // Продовжити без акаунту
-                    SizedBox(
-                      height: AppDimensions.buttonHeightXLarge,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          context
-                              .read<AuthBloc>()
-                              .add(const AuthGuestModeRequested());
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.borderColor),
-                        ),
-                        child: const Text(
-                          AppStrings.continueWithoutAccount,
-                          style: TextStyle(color: AppColors.textSecondary),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppDimensions.spacerLarge),
-                    // Реєстрація
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Ще не маєте акаунту?',
-                          style: TextStyle(color: AppColors.textSecondary),
-                        ),
-                        TextButton(
-                          onPressed: () => context.go(AppRoutes.register),
+                    if (!isAdminMode)
+                      SizedBox(
+                        height: AppDimensions.buttonHeightXLarge,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            context
+                                .read<AuthBloc>()
+                                .add(const AuthGuestModeRequested());
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AppColors.borderColor),
+                          ),
                           child: const Text(
-                            AppStrings.signUp,
-                            style: TextStyle(
-                              color: AppColors.primaryRed,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            AppStrings.continueWithoutAccount,
+                            style: TextStyle(color: AppColors.textSecondary),
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: AppDimensions.spacerMedium),
+                      ),
+                    if (!isAdminMode)
+                      const SizedBox(height: AppDimensions.spacerLarge),
+                    // Реєстрація
+                    if (!isAdminMode)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Ще не маєте акаунту?',
+                            style: TextStyle(color: AppColors.textSecondary),
+                          ),
+                          TextButton(
+                            onPressed: () => context.go(AppRoutes.register),
+                            child: const Text(
+                              AppStrings.signUp,
+                              style: TextStyle(
+                                color: AppColors.primaryRed,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (!isAdminMode)
+                      const SizedBox(height: AppDimensions.spacerMedium),
                     // Demo hint
                     Text(
                       AppStrings.demoCredentialsHint,

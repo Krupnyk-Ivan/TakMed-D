@@ -97,20 +97,32 @@ class GamificationBloc extends Bloc<GamificationEvent, GamificationState> {
 
     // Перевіряємо значки
     final newlyUnlocked = <Achievement>[];
+
     await _tryUnlock('first_lesson', newlyUnlocked);
     if (newStreak >= 3) await _tryUnlock('streak_3', newlyUnlocked);
     if (newStreak >= 7) await _tryUnlock('streak_7', newlyUnlocked);
     if (newStreak >= 30) await _tryUnlock('streak_30', newlyUnlocked);
-    if (event.isAllCourseComplete) {
-      if (event.courseRemoteId == 'mil-1') await _tryUnlock('march_complete', newlyUnlocked);
-      if (event.courseRemoteId == 'mil-2') await _tryUnlock('tourniquet_master', newlyUnlocked);
-      if (event.courseRemoteId == 'mil-3') await _tryUnlock('chest_seal_pro', newlyUnlocked);
-      if (event.courseRemoteId == 'civ-2') await _tryUnlock('cpr_expert', newlyUnlocked);
-      await _tryUnlock('veteran', newlyUnlocked);
-    }
-    if (event.isOffline) await _tryUnlock('offline_warrior', newlyUnlocked);
+    if (event.totalCompletedLessons >= 1) await _tryUnlock('first_lesson', newlyUnlocked);
     if (event.totalCompletedLessons >= 5) await _tryUnlock('knowledge_seeker', newlyUnlocked);
+    if (event.isOffline) await _tryUnlock('offline_warrior', newlyUnlocked);
     if (DateTime.now().hour >= 22) await _tryUnlock('night_owl', newlyUnlocked);
+    if (event.isAllCourseComplete) {
+      await _gamificationService.markCourseCompleted(event.courseRemoteId);
+      final rid = event.courseRemoteId.toLowerCase();
+      if (rid.contains('march')) await _tryUnlock('march_complete', newlyUnlocked);
+      if (rid.contains('tourniquet') || rid.contains('turniket')) {
+        await _tryUnlock('tourniquet_master', newlyUnlocked);
+      }
+      if (rid.contains('chest') || rid.contains('pnevmo')) {
+        await _tryUnlock('chest_seal_pro', newlyUnlocked);
+      }
+      if (rid.contains('cpr') || rid.contains('slr')) {
+        await _tryUnlock('cpr_expert', newlyUnlocked);
+      }
+      if (_gamificationService.getCompletedCoursesCount() >= 3) {
+        await _tryUnlock('veteran', newlyUnlocked);
+      }
+    }
 
     emit(state.copyWith(
       totalXp: _gamificationService.getTotalXp(),
@@ -164,6 +176,9 @@ class GamificationBloc extends Bloc<GamificationEvent, GamificationState> {
     if (newStreak >= 3) await _tryUnlock('streak_3', newlyUnlocked);
     if (newStreak >= 7) await _tryUnlock('streak_7', newlyUnlocked);
     if (newStreak >= 30) await _tryUnlock('streak_30', newlyUnlocked);
+    // quiz_5 не в списку 15 — замість нього knowledge_seeker покривається через lesson
+    // night_owl — якщо тест пройдено після 22:00
+    if (DateTime.now().hour >= 22) await _tryUnlock('night_owl', newlyUnlocked);
 
     emit(state.copyWith(
       totalXp: _gamificationService.getTotalXp(),

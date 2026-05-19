@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(flutter analyze *)"
+      "Bash(flutter analyze *)",
+      "Bash(flutter test *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\38068\\\\TakMed D\\\\takmed\\\\lib\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(flutter pub *)",
+      "Bash(npx supabase *)",
+      "Bash(dart run *)",
+      "Bash(flutter *)",
+      "Bash(supabase *)"
     ]
   }
 }

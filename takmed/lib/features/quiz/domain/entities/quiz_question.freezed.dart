@@ -24,6 +24,8 @@ QuizQuestion _$QuizQuestionFromJson(Map<String, dynamic> json) {
       return SequenceQuestion.fromJson(json);
     case 'imageMatch':
       return ImageMatchQuestion.fromJson(json);
+    case 'multiSelect':
+      return MultiSelectQuestion.fromJson(json);
 
     default:
       throw CheckedFromJsonException(json, 'runtimeType', 'QuizQuestion',
@@ -62,6 +64,15 @@ mixin _$QuizQuestion {
             String correctId,
             String explanation)
         imageMatch,
+    required TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)
+        multiSelect,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -90,6 +101,15 @@ mixin _$QuizQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult? Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -118,6 +138,15 @@ mixin _$QuizQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -127,6 +156,7 @@ mixin _$QuizQuestion {
     required TResult Function(TrueFalseQuestion value) trueFalse,
     required TResult Function(SequenceQuestion value) sequence,
     required TResult Function(ImageMatchQuestion value) imageMatch,
+    required TResult Function(MultiSelectQuestion value) multiSelect,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -135,6 +165,7 @@ mixin _$QuizQuestion {
     TResult? Function(TrueFalseQuestion value)? trueFalse,
     TResult? Function(SequenceQuestion value)? sequence,
     TResult? Function(ImageMatchQuestion value)? imageMatch,
+    TResult? Function(MultiSelectQuestion value)? multiSelect,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -143,6 +174,7 @@ mixin _$QuizQuestion {
     TResult Function(TrueFalseQuestion value)? trueFalse,
     TResult Function(SequenceQuestion value)? sequence,
     TResult Function(ImageMatchQuestion value)? imageMatch,
+    TResult Function(MultiSelectQuestion value)? multiSelect,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -397,6 +429,15 @@ class _$MultipleChoiceQuestionImpl implements MultipleChoiceQuestion {
             String correctId,
             String explanation)
         imageMatch,
+    required TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)
+        multiSelect,
   }) {
     return multipleChoice(
         id, text, tags, imageUrl, options, correctId, explanation);
@@ -429,6 +470,15 @@ class _$MultipleChoiceQuestionImpl implements MultipleChoiceQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult? Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
   }) {
     return multipleChoice?.call(
         id, text, tags, imageUrl, options, correctId, explanation);
@@ -461,6 +511,15 @@ class _$MultipleChoiceQuestionImpl implements MultipleChoiceQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
     required TResult orElse(),
   }) {
     if (multipleChoice != null) {
@@ -477,6 +536,7 @@ class _$MultipleChoiceQuestionImpl implements MultipleChoiceQuestion {
     required TResult Function(TrueFalseQuestion value) trueFalse,
     required TResult Function(SequenceQuestion value) sequence,
     required TResult Function(ImageMatchQuestion value) imageMatch,
+    required TResult Function(MultiSelectQuestion value) multiSelect,
   }) {
     return multipleChoice(this);
   }
@@ -488,6 +548,7 @@ class _$MultipleChoiceQuestionImpl implements MultipleChoiceQuestion {
     TResult? Function(TrueFalseQuestion value)? trueFalse,
     TResult? Function(SequenceQuestion value)? sequence,
     TResult? Function(ImageMatchQuestion value)? imageMatch,
+    TResult? Function(MultiSelectQuestion value)? multiSelect,
   }) {
     return multipleChoice?.call(this);
   }
@@ -499,6 +560,7 @@ class _$MultipleChoiceQuestionImpl implements MultipleChoiceQuestion {
     TResult Function(TrueFalseQuestion value)? trueFalse,
     TResult Function(SequenceQuestion value)? sequence,
     TResult Function(ImageMatchQuestion value)? imageMatch,
+    TResult Function(MultiSelectQuestion value)? multiSelect,
     required TResult orElse(),
   }) {
     if (multipleChoice != null) {
@@ -705,6 +767,15 @@ class _$TrueFalseQuestionImpl implements TrueFalseQuestion {
             String correctId,
             String explanation)
         imageMatch,
+    required TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)
+        multiSelect,
   }) {
     return trueFalse(id, statement, tags, correctAnswer, explanation);
   }
@@ -736,6 +807,15 @@ class _$TrueFalseQuestionImpl implements TrueFalseQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult? Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
   }) {
     return trueFalse?.call(id, statement, tags, correctAnswer, explanation);
   }
@@ -767,6 +847,15 @@ class _$TrueFalseQuestionImpl implements TrueFalseQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
     required TResult orElse(),
   }) {
     if (trueFalse != null) {
@@ -782,6 +871,7 @@ class _$TrueFalseQuestionImpl implements TrueFalseQuestion {
     required TResult Function(TrueFalseQuestion value) trueFalse,
     required TResult Function(SequenceQuestion value) sequence,
     required TResult Function(ImageMatchQuestion value) imageMatch,
+    required TResult Function(MultiSelectQuestion value) multiSelect,
   }) {
     return trueFalse(this);
   }
@@ -793,6 +883,7 @@ class _$TrueFalseQuestionImpl implements TrueFalseQuestion {
     TResult? Function(TrueFalseQuestion value)? trueFalse,
     TResult? Function(SequenceQuestion value)? sequence,
     TResult? Function(ImageMatchQuestion value)? imageMatch,
+    TResult? Function(MultiSelectQuestion value)? multiSelect,
   }) {
     return trueFalse?.call(this);
   }
@@ -804,6 +895,7 @@ class _$TrueFalseQuestionImpl implements TrueFalseQuestion {
     TResult Function(TrueFalseQuestion value)? trueFalse,
     TResult Function(SequenceQuestion value)? sequence,
     TResult Function(ImageMatchQuestion value)? imageMatch,
+    TResult Function(MultiSelectQuestion value)? multiSelect,
     required TResult orElse(),
   }) {
     if (trueFalse != null) {
@@ -1017,6 +1109,15 @@ class _$SequenceQuestionImpl implements SequenceQuestion {
             String correctId,
             String explanation)
         imageMatch,
+    required TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)
+        multiSelect,
   }) {
     return sequence(id, instruction, tags, items, explanation);
   }
@@ -1048,6 +1149,15 @@ class _$SequenceQuestionImpl implements SequenceQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult? Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
   }) {
     return sequence?.call(id, instruction, tags, items, explanation);
   }
@@ -1079,6 +1189,15 @@ class _$SequenceQuestionImpl implements SequenceQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
     required TResult orElse(),
   }) {
     if (sequence != null) {
@@ -1094,6 +1213,7 @@ class _$SequenceQuestionImpl implements SequenceQuestion {
     required TResult Function(TrueFalseQuestion value) trueFalse,
     required TResult Function(SequenceQuestion value) sequence,
     required TResult Function(ImageMatchQuestion value) imageMatch,
+    required TResult Function(MultiSelectQuestion value) multiSelect,
   }) {
     return sequence(this);
   }
@@ -1105,6 +1225,7 @@ class _$SequenceQuestionImpl implements SequenceQuestion {
     TResult? Function(TrueFalseQuestion value)? trueFalse,
     TResult? Function(SequenceQuestion value)? sequence,
     TResult? Function(ImageMatchQuestion value)? imageMatch,
+    TResult? Function(MultiSelectQuestion value)? multiSelect,
   }) {
     return sequence?.call(this);
   }
@@ -1116,6 +1237,7 @@ class _$SequenceQuestionImpl implements SequenceQuestion {
     TResult Function(TrueFalseQuestion value)? trueFalse,
     TResult Function(SequenceQuestion value)? sequence,
     TResult Function(ImageMatchQuestion value)? imageMatch,
+    TResult Function(MultiSelectQuestion value)? multiSelect,
     required TResult orElse(),
   }) {
     if (sequence != null) {
@@ -1353,6 +1475,15 @@ class _$ImageMatchQuestionImpl implements ImageMatchQuestion {
             String correctId,
             String explanation)
         imageMatch,
+    required TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)
+        multiSelect,
   }) {
     return imageMatch(
         id, imageUrl, question, tags, options, correctId, explanation);
@@ -1385,6 +1516,15 @@ class _$ImageMatchQuestionImpl implements ImageMatchQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult? Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
   }) {
     return imageMatch?.call(
         id, imageUrl, question, tags, options, correctId, explanation);
@@ -1417,6 +1557,15 @@ class _$ImageMatchQuestionImpl implements ImageMatchQuestion {
             String correctId,
             String explanation)?
         imageMatch,
+    TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
     required TResult orElse(),
   }) {
     if (imageMatch != null) {
@@ -1433,6 +1582,7 @@ class _$ImageMatchQuestionImpl implements ImageMatchQuestion {
     required TResult Function(TrueFalseQuestion value) trueFalse,
     required TResult Function(SequenceQuestion value) sequence,
     required TResult Function(ImageMatchQuestion value) imageMatch,
+    required TResult Function(MultiSelectQuestion value) multiSelect,
   }) {
     return imageMatch(this);
   }
@@ -1444,6 +1594,7 @@ class _$ImageMatchQuestionImpl implements ImageMatchQuestion {
     TResult? Function(TrueFalseQuestion value)? trueFalse,
     TResult? Function(SequenceQuestion value)? sequence,
     TResult? Function(ImageMatchQuestion value)? imageMatch,
+    TResult? Function(MultiSelectQuestion value)? multiSelect,
   }) {
     return imageMatch?.call(this);
   }
@@ -1455,6 +1606,7 @@ class _$ImageMatchQuestionImpl implements ImageMatchQuestion {
     TResult Function(TrueFalseQuestion value)? trueFalse,
     TResult Function(SequenceQuestion value)? sequence,
     TResult Function(ImageMatchQuestion value)? imageMatch,
+    TResult Function(MultiSelectQuestion value)? multiSelect,
     required TResult orElse(),
   }) {
     if (imageMatch != null) {
@@ -1500,5 +1652,384 @@ abstract class ImageMatchQuestion implements QuizQuestion {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ImageMatchQuestionImplCopyWith<_$ImageMatchQuestionImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$MultiSelectQuestionImplCopyWith<$Res>
+    implements $QuizQuestionCopyWith<$Res> {
+  factory _$$MultiSelectQuestionImplCopyWith(_$MultiSelectQuestionImpl value,
+          $Res Function(_$MultiSelectQuestionImpl) then) =
+      __$$MultiSelectQuestionImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String text,
+      List<String> tags,
+      String? imageUrl,
+      List<AnswerOption> options,
+      List<String> correctIds,
+      String explanation});
+}
+
+/// @nodoc
+class __$$MultiSelectQuestionImplCopyWithImpl<$Res>
+    extends _$QuizQuestionCopyWithImpl<$Res, _$MultiSelectQuestionImpl>
+    implements _$$MultiSelectQuestionImplCopyWith<$Res> {
+  __$$MultiSelectQuestionImplCopyWithImpl(_$MultiSelectQuestionImpl _value,
+      $Res Function(_$MultiSelectQuestionImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of QuizQuestion
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? text = null,
+    Object? tags = null,
+    Object? imageUrl = freezed,
+    Object? options = null,
+    Object? correctIds = null,
+    Object? explanation = null,
+  }) {
+    return _then(_$MultiSelectQuestionImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      text: null == text
+          ? _value.text
+          : text // ignore: cast_nullable_to_non_nullable
+              as String,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      imageUrl: freezed == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      options: null == options
+          ? _value._options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<AnswerOption>,
+      correctIds: null == correctIds
+          ? _value._correctIds
+          : correctIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      explanation: null == explanation
+          ? _value.explanation
+          : explanation // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$MultiSelectQuestionImpl implements MultiSelectQuestion {
+  const _$MultiSelectQuestionImpl(
+      {required this.id,
+      required this.text,
+      final List<String> tags = const [],
+      this.imageUrl,
+      required final List<AnswerOption> options,
+      required final List<String> correctIds,
+      required this.explanation,
+      final String? $type})
+      : _tags = tags,
+        _options = options,
+        _correctIds = correctIds,
+        $type = $type ?? 'multiSelect';
+
+  factory _$MultiSelectQuestionImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MultiSelectQuestionImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String text;
+  final List<String> _tags;
+  @override
+  @JsonKey()
+  List<String> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
+  @override
+  final String? imageUrl;
+  final List<AnswerOption> _options;
+  @override
+  List<AnswerOption> get options {
+    if (_options is EqualUnmodifiableListView) return _options;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_options);
+  }
+
+  final List<String> _correctIds;
+  @override
+  List<String> get correctIds {
+    if (_correctIds is EqualUnmodifiableListView) return _correctIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_correctIds);
+  }
+
+  @override
+  final String explanation;
+
+  @JsonKey(name: 'runtimeType')
+  final String $type;
+
+  @override
+  String toString() {
+    return 'QuizQuestion.multiSelect(id: $id, text: $text, tags: $tags, imageUrl: $imageUrl, options: $options, correctIds: $correctIds, explanation: $explanation)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$MultiSelectQuestionImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.text, text) || other.text == text) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl) &&
+            const DeepCollectionEquality().equals(other._options, _options) &&
+            const DeepCollectionEquality()
+                .equals(other._correctIds, _correctIds) &&
+            (identical(other.explanation, explanation) ||
+                other.explanation == explanation));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      text,
+      const DeepCollectionEquality().hash(_tags),
+      imageUrl,
+      const DeepCollectionEquality().hash(_options),
+      const DeepCollectionEquality().hash(_correctIds),
+      explanation);
+
+  /// Create a copy of QuizQuestion
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$MultiSelectQuestionImplCopyWith<_$MultiSelectQuestionImpl> get copyWith =>
+      __$$MultiSelectQuestionImplCopyWithImpl<_$MultiSelectQuestionImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            String correctId,
+            String explanation)
+        multipleChoice,
+    required TResult Function(String id, String statement, List<String> tags,
+            bool correctAnswer, String explanation)
+        trueFalse,
+    required TResult Function(String id, String instruction, List<String> tags,
+            List<SequenceItem> items, String explanation)
+        sequence,
+    required TResult Function(
+            String id,
+            String imageUrl,
+            String question,
+            List<String> tags,
+            List<AnswerOption> options,
+            String correctId,
+            String explanation)
+        imageMatch,
+    required TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)
+        multiSelect,
+  }) {
+    return multiSelect(
+        id, text, tags, imageUrl, options, correctIds, explanation);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            String correctId,
+            String explanation)?
+        multipleChoice,
+    TResult? Function(String id, String statement, List<String> tags,
+            bool correctAnswer, String explanation)?
+        trueFalse,
+    TResult? Function(String id, String instruction, List<String> tags,
+            List<SequenceItem> items, String explanation)?
+        sequence,
+    TResult? Function(
+            String id,
+            String imageUrl,
+            String question,
+            List<String> tags,
+            List<AnswerOption> options,
+            String correctId,
+            String explanation)?
+        imageMatch,
+    TResult? Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
+  }) {
+    return multiSelect?.call(
+        id, text, tags, imageUrl, options, correctIds, explanation);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            String correctId,
+            String explanation)?
+        multipleChoice,
+    TResult Function(String id, String statement, List<String> tags,
+            bool correctAnswer, String explanation)?
+        trueFalse,
+    TResult Function(String id, String instruction, List<String> tags,
+            List<SequenceItem> items, String explanation)?
+        sequence,
+    TResult Function(
+            String id,
+            String imageUrl,
+            String question,
+            List<String> tags,
+            List<AnswerOption> options,
+            String correctId,
+            String explanation)?
+        imageMatch,
+    TResult Function(
+            String id,
+            String text,
+            List<String> tags,
+            String? imageUrl,
+            List<AnswerOption> options,
+            List<String> correctIds,
+            String explanation)?
+        multiSelect,
+    required TResult orElse(),
+  }) {
+    if (multiSelect != null) {
+      return multiSelect(
+          id, text, tags, imageUrl, options, correctIds, explanation);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(MultipleChoiceQuestion value) multipleChoice,
+    required TResult Function(TrueFalseQuestion value) trueFalse,
+    required TResult Function(SequenceQuestion value) sequence,
+    required TResult Function(ImageMatchQuestion value) imageMatch,
+    required TResult Function(MultiSelectQuestion value) multiSelect,
+  }) {
+    return multiSelect(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(MultipleChoiceQuestion value)? multipleChoice,
+    TResult? Function(TrueFalseQuestion value)? trueFalse,
+    TResult? Function(SequenceQuestion value)? sequence,
+    TResult? Function(ImageMatchQuestion value)? imageMatch,
+    TResult? Function(MultiSelectQuestion value)? multiSelect,
+  }) {
+    return multiSelect?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(MultipleChoiceQuestion value)? multipleChoice,
+    TResult Function(TrueFalseQuestion value)? trueFalse,
+    TResult Function(SequenceQuestion value)? sequence,
+    TResult Function(ImageMatchQuestion value)? imageMatch,
+    TResult Function(MultiSelectQuestion value)? multiSelect,
+    required TResult orElse(),
+  }) {
+    if (multiSelect != null) {
+      return multiSelect(this);
+    }
+    return orElse();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$MultiSelectQuestionImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class MultiSelectQuestion implements QuizQuestion {
+  const factory MultiSelectQuestion(
+      {required final String id,
+      required final String text,
+      final List<String> tags,
+      final String? imageUrl,
+      required final List<AnswerOption> options,
+      required final List<String> correctIds,
+      required final String explanation}) = _$MultiSelectQuestionImpl;
+
+  factory MultiSelectQuestion.fromJson(Map<String, dynamic> json) =
+      _$MultiSelectQuestionImpl.fromJson;
+
+  @override
+  String get id;
+  String get text;
+  @override
+  List<String> get tags;
+  String? get imageUrl;
+  List<AnswerOption> get options;
+  List<String> get correctIds;
+  @override
+  String get explanation;
+
+  /// Create a copy of QuizQuestion
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$MultiSelectQuestionImplCopyWith<_$MultiSelectQuestionImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

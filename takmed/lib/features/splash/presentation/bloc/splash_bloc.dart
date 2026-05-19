@@ -31,24 +31,31 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     // Затримка для анімації splash
     await Future<void>.delayed(const Duration(milliseconds: 1500));
 
-    // 1. Перевіряє, чи онбординг пройдений
+    // 1. Спочатку авторизація — без неї нікуди не пускаємо.
+    final isAuthenticated = await _authRepository.isAuthenticated();
+    if (!isAuthenticated) {
+      emit(state.copyWith(status: SplashStatus.navigateToLogin));
+      return;
+    }
+
+    // 2. Перевірка адмінства.
+    final currentUser = await _authRepository.getCurrentUser();
+    if (currentUser?.role == 'admin') {
+      emit(state.copyWith(status: SplashStatus.navigateToAdmin));
+      return;
+    }
+
+    // 3. Тепер — чи пройдений онбординг (вибір треку тощо).
     final onboardingCompleted =
         await _onboardingRepository.isOnboardingCompleted();
-
     if (!onboardingCompleted) {
       emit(state.copyWith(status: SplashStatus.navigateToOnboarding));
       return;
     }
 
-    // 2. Перевіряє, чи є валідний токен
-    final isAuthenticated = await _authRepository.isAuthenticated();
-
-    if (isAuthenticated) {
-      unawaited(_runInitialSync());
-      emit(state.copyWith(status: SplashStatus.navigateToHome));
-    } else {
-      emit(state.copyWith(status: SplashStatus.navigateToLogin));
-    }
+    // 4. Усе готово — додому.
+    unawaited(_runInitialSync());
+    emit(state.copyWith(status: SplashStatus.navigateToHome));
   }
 
   Future<void> _runInitialSync() async {

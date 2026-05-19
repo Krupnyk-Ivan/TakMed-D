@@ -68,6 +68,8 @@ class _SplashPageState extends State<SplashPage>
             context.go(AppRoutes.home);
           case SplashStatus.navigateToLogin:
             context.go(AppRoutes.login);
+          case SplashStatus.navigateToAdmin:
+            context.go(AppRoutes.adminDashboard);
           default:
             break;
         }

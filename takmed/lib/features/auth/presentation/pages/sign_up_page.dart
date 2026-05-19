@@ -5,9 +5,19 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../onboarding/domain/repositories/onboarding_repository.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+
+/// Після успішної реєстрації — спершу онбординг (вибір треку), потім home.
+Future<void> _goAfterSignUp(BuildContext context) async {
+  final completed =
+      await getIt<OnboardingRepository>().isOnboardingCompleted();
+  if (!context.mounted) return;
+  context.go(completed ? AppRoutes.home : AppRoutes.onboarding);
+}
 
 /// Екран реєстрації нового користувача.
 class SignUpPage extends StatelessWidget {
@@ -32,7 +42,7 @@ class SignUpPage extends StatelessWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text(AppStrings.signUpSuccess)),
             );
-            context.go(AppRoutes.home);
+            _goAfterSignUp(context);
           } else if (state.status == AuthStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

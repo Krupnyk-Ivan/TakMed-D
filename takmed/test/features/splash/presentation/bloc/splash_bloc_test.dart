@@ -48,88 +48,61 @@ void main() {
 
   group('SplashBloc — навігація', () {
     blocTest<SplashBloc, SplashState>(
-      'новий юзер (онбординг не пройдений) → navigateToOnboarding',
+      'немає сесії → navigateToLogin (онбординг не перевіряється)',
       build: () {
         when(
-          mockOnboardingRepository.isOnboardingCompleted(),
+          mockAuthRepository.isAuthenticated(),
         ).thenAnswer((_) async => false);
         return createBloc();
       },
       act: (bloc) => bloc.add(const SplashStarted()),
       wait: const Duration(seconds: 2),
-      expect:
-          () => [
-            isA<SplashState>().having(
-              (s) => s.status,
-              'status',
-              SplashStatus.checking,
-            ),
-            isA<SplashState>().having(
-              (s) => s.status,
-              'status',
-              SplashStatus.navigateToOnboarding,
-            ),
-          ],
+      expect: () => [
+        isA<SplashState>().having((s) => s.status, 'status', SplashStatus.checking),
+        isA<SplashState>().having((s) => s.status, 'status', SplashStatus.navigateToLogin),
+      ],
       verify: (_) {
+        verify(mockAuthRepository.isAuthenticated()).called(1);
+        verifyNever(mockOnboardingRepository.isOnboardingCompleted());
+      },
+    );
+
+    blocTest<SplashBloc, SplashState>(
+      'є сесія + онбординг пройдений → navigateToHome',
+      build: () {
+        when(mockAuthRepository.isAuthenticated()).thenAnswer((_) async => true);
+        when(mockAuthRepository.getCurrentUser()).thenAnswer((_) async => null);
+        when(mockOnboardingRepository.isOnboardingCompleted())
+            .thenAnswer((_) async => true);
+        return createBloc();
+      },
+      act: (bloc) => bloc.add(const SplashStarted()),
+      wait: const Duration(seconds: 2),
+      expect: () => [
+        isA<SplashState>().having((s) => s.status, 'status', SplashStatus.checking),
+        isA<SplashState>().having((s) => s.status, 'status', SplashStatus.navigateToHome),
+      ],
+    );
+
+    blocTest<SplashBloc, SplashState>(
+      'є сесія + онбординг НЕ пройдений → navigateToOnboarding',
+      build: () {
+        when(mockAuthRepository.isAuthenticated()).thenAnswer((_) async => true);
+        when(mockAuthRepository.getCurrentUser()).thenAnswer((_) async => null);
+        when(mockOnboardingRepository.isOnboardingCompleted())
+            .thenAnswer((_) async => false);
+        return createBloc();
+      },
+      act: (bloc) => bloc.add(const SplashStarted()),
+      wait: const Duration(seconds: 2),
+      expect: () => [
+        isA<SplashState>().having((s) => s.status, 'status', SplashStatus.checking),
+        isA<SplashState>().having((s) => s.status, 'status', SplashStatus.navigateToOnboarding),
+      ],
+      verify: (_) {
+        verify(mockAuthRepository.isAuthenticated()).called(1);
         verify(mockOnboardingRepository.isOnboardingCompleted()).called(1);
-        verifyNever(mockAuthRepository.isAuthenticated());
       },
-    );
-
-    blocTest<SplashBloc, SplashState>(
-      'онбординг пройдений + токен валідний → navigateToHome',
-      build: () {
-        when(
-          mockOnboardingRepository.isOnboardingCompleted(),
-        ).thenAnswer((_) async => true);
-        when(
-          mockAuthRepository.isAuthenticated(),
-        ).thenAnswer((_) async => true);
-        return createBloc();
-      },
-      act: (bloc) => bloc.add(const SplashStarted()),
-      wait: const Duration(seconds: 2),
-      expect:
-          () => [
-            isA<SplashState>().having(
-              (s) => s.status,
-              'status',
-              SplashStatus.checking,
-            ),
-            isA<SplashState>().having(
-              (s) => s.status,
-              'status',
-              SplashStatus.navigateToHome,
-            ),
-          ],
-    );
-
-    blocTest<SplashBloc, SplashState>(
-      'онбординг пройдений + немає токена → navigateToLogin',
-      build: () {
-        when(
-          mockOnboardingRepository.isOnboardingCompleted(),
-        ).thenAnswer((_) async => true);
-        when(
-          mockAuthRepository.isAuthenticated(),
-        ).thenAnswer((_) async => false);
-        return createBloc();
-      },
-      act: (bloc) => bloc.add(const SplashStarted()),
-      wait: const Duration(seconds: 2),
-      expect:
-          () => [
-            isA<SplashState>().having(
-              (s) => s.status,
-              'status',
-              SplashStatus.checking,
-            ),
-            isA<SplashState>().having(
-              (s) => s.status,
-              'status',
-              SplashStatus.navigateToLogin,
-            ),
-          ],
     );
   });
 }

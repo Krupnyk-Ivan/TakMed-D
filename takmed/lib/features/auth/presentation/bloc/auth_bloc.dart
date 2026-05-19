@@ -313,9 +313,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final user = _supabaseClient.auth.currentUser;
 
     if (session != null && user != null) {
-      // Користувач вже авторизований — відновлюємо стан
       final name = user.userMetadata?['name'] as String? ??
           (user.email?.split('@').first ?? 'User');
+
+      String role = 'student';
+      try {
+        final profile = await _supabaseClient
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+        role = profile['role'] as String? ?? 'student';
+      } catch (_) {}
+
       emit(state.copyWith(
         status: AuthStatus.success,
         user: AuthUserModel(
@@ -323,6 +333,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           email: user.email ?? '',
           name: name,
           token: session.accessToken,
+          role: role,
         ),
       ));
     } else {

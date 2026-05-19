@@ -39,6 +39,8 @@ class GamificationQuizCompleted extends GamificationEvent {
   final int earnedXp;
   final String courseRemoteId;
   final int fastAnswerCount;
+  /// Загальна кількість спроб тестів (для досягнення quiz_5).
+  final int totalQuizAttempts;
 
   const GamificationQuizCompleted({
     required this.totalQuestions,
@@ -46,11 +48,12 @@ class GamificationQuizCompleted extends GamificationEvent {
     required this.earnedXp,
     required this.courseRemoteId,
     required this.fastAnswerCount,
+    this.totalQuizAttempts = 0,
   });
 
   @override
   List<Object?> get props =>
-      [totalQuestions, correctAnswers, earnedXp, courseRemoteId, fastAnswerCount];
+      [totalQuestions, correctAnswers, earnedXp, courseRemoteId, fastAnswerCount, totalQuizAttempts];
 }
 
 /// Скидає leveledUp та newlyUnlocked після показу анімацій/банерів.

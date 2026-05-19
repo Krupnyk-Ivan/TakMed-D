@@ -8,6 +8,7 @@ class AuthUser extends Equatable {
     required this.email,
     required this.name,
     required this.token,
+    this.role = 'student',
   });
 
   /// Ідентифікатор користувача.
@@ -22,6 +23,9 @@ class AuthUser extends Equatable {
   /// Маркер доступу (access token).
   final String token;
 
+  /// Роль користувача.
+  final String role;
+
   @override
-  List<Object?> get props => <Object?>[id, email, name, token];
+  List<Object?> get props => <Object?>[id, email, name, token, role];
 }

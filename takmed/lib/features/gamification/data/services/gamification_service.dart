@@ -6,6 +6,7 @@ class GamificationService {
 
   static const String _xpKey = 'gamification_total_xp';
   static const String _lastLoginDateKey = 'gamification_last_login_date';
+  static const String _completedCoursesKey = 'gamification_completed_courses';
 
   GamificationService(this._prefs);
 
@@ -32,6 +33,17 @@ class GamificationService {
     await _prefs.setString(_lastLoginDateKey, todayStr);
     await awardXp(5);
     return 5;
+  }
+
+  int getCompletedCoursesCount() {
+    final set = _prefs.getStringList(_completedCoursesKey) ?? [];
+    return set.length;
+  }
+
+  Future<void> markCourseCompleted(String courseRemoteId) async {
+    final set = (_prefs.getStringList(_completedCoursesKey) ?? []).toSet();
+    set.add(courseRemoteId);
+    await _prefs.setStringList(_completedCoursesKey, set.toList());
   }
 
   Future<void> resetXp() async {
