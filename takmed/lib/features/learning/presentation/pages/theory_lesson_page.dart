@@ -209,7 +209,7 @@ class _TheoryLessonPageState extends State<TheoryLessonPage> {
     }
 
     if (_isMarchChecklist(content)) {
-      return const MarchEducationalPage();
+      return MarchEducationalPage(lessonId: _lesson!.id);
     }
     return GenericChecklistPage(lesson: _lesson!, content: content);
   }

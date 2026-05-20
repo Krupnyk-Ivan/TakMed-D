@@ -5,6 +5,9 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../domain/entities/march_item.dart';
+import '../../../../features/gamification/data/services/gamification_service.dart';
+import '../../../../features/learning/domain/repositories/learning_repository.dart';
+import '../../domain/repositories/march_repository.dart';
 import '../bloc/march_educational_bloc.dart';
 import '../bloc/march_educational_event.dart';
 import '../bloc/march_educational_state.dart';
@@ -14,13 +17,19 @@ import '../widgets/march_step_card.dart';
 import 'march_results_page.dart';
 
 class MarchEducationalPage extends StatelessWidget {
-  const MarchEducationalPage({super.key});
+  const MarchEducationalPage({super.key, this.lessonId});
+
+  final int? lessonId;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<MarchEducationalBloc>(
-      create: (_) =>
-          getIt<MarchEducationalBloc>()..add(const MarchSessionStarted()),
+      create: (_) => MarchEducationalBloc(
+        getIt<MarchRepository>(),
+        getIt<GamificationService>(),
+        getIt<LearningRepository>(),
+        lessonId: lessonId,
+      )..add(const MarchSessionStarted()),
       child: const _MarchView(),
     );
   }

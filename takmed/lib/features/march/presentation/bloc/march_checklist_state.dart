@@ -74,6 +74,14 @@ final class MarchChecklistState extends Equatable {
   bool get hasCriticalFailure =>
       steps.values.any((s) => s is StepFailed);
 
+  /// % успішності — частка успішних кроків (не Failed) від загальної кількості.
+  int get successRate {
+    final total = MarchStep.values.length;
+    if (total == 0) return 0;
+    final failed = steps.values.where((s) => s is StepFailed).length;
+    return ((total - failed) / total * 100).round();
+  }
+
   // ─── Validation helpers ──────────────────────────────────────────────────────
 
   /// Повертає `true` якщо крок можна розпочати або пропустити:

@@ -46,12 +46,11 @@ class MarchSession extends Equatable {
     return end.difference(startedAt).inSeconds;
   }
 
-  /// % успішності — частка кроків з правильним quiz.
+  /// % успішності — частка кроків з правильним quiz від загальної кількості кроків.
   int get successRatePercent {
-    final answered = items.where((it) => it.quizAnsweredCorrectly != null).length;
-    if (answered == 0) return 0;
+    if (items.isEmpty) return 0;
     final correct = items.where((it) => it.quizAnsweredCorrectly == true).length;
-    return (correct * 100 / answered).round();
+    return (correct * 100 / items.length).round();
   }
 
   /// Слабкі теми (за timeExceeded або failed quiz).

@@ -122,10 +122,10 @@ class _MarchChecklistView extends StatelessWidget {
   }
 
   /// Завершити урок і перейти назад до курсу.
-  Future<void> _finishLesson(BuildContext context) async {
+  Future<void> _finishLesson(BuildContext context, int successRate) async {
     if (lesson == null) return;
     final repo = getIt<LearningRepository>();
-    await repo.completeLesson(lesson!.id, 100);
+    await repo.completeLesson(lesson!.id, successRate);
 
     // Нараховуємо гейміфікацію
     final courseRemoteId =
@@ -232,7 +232,7 @@ class _MarchChecklistView extends StatelessWidget {
               // Кнопка завершення уроку (тільки в режимі уроку + коли все виконано)
               if (lesson != null &&
                   state.overallStatus == MarchOverallStatus.completed)
-                _buildFinishButton(context),
+                _buildFinishButton(context, state.successRate),
             ],
           );
         },
@@ -286,7 +286,7 @@ class _MarchChecklistView extends StatelessWidget {
     );
   }
 
-  Widget _buildFinishButton(BuildContext context) {
+  Widget _buildFinishButton(BuildContext context, int successRate) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(AppDimensions.paddingMedium),
@@ -294,7 +294,7 @@ class _MarchChecklistView extends StatelessWidget {
           width: double.infinity,
           height: AppDimensions.buttonHeightXLarge,
           child: ElevatedButton(
-            onPressed: () => _finishLesson(context),
+            onPressed: () => _finishLesson(context, successRate),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.successGreen,
               shape: RoundedRectangleBorder(

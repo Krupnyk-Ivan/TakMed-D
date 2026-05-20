@@ -380,6 +380,7 @@ void setupMarchEducationalDI() {
     () => MarchEducationalBloc(
       getIt<MarchRepository>(),
       getIt<GamificationService>(),
+      getIt<LearningRepository>(),
     ),
   );
 }

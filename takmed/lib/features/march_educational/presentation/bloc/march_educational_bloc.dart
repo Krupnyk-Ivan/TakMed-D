@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../gamification/data/services/gamification_service.dart';
+import '../../../learning/domain/repositories/learning_repository.dart';
 import '../../domain/entities/march_item.dart';
 import '../../domain/entities/march_quiz_question.dart';
 import '../../domain/entities/march_session.dart';
@@ -13,8 +14,12 @@ const int _xpPerCorrectStep = 20;
 
 class MarchEducationalBloc
     extends Bloc<MarchEducationalEvent, MarchEducationalState> {
-  MarchEducationalBloc(this._repository, this._gamification)
-      : super(const MarchEducationalState()) {
+  MarchEducationalBloc(
+    this._repository,
+    this._gamification,
+    this._learningRepository, {
+    this.lessonId,
+  }) : super(const MarchEducationalState()) {
     on<MarchSessionStarted>(_onStarted);
     on<MarchHintToggled>(_onHintToggled);
     on<MarchStepCompleteRequested>(_onCompleteRequested);
@@ -26,6 +31,8 @@ class MarchEducationalBloc
 
   final MarchRepository _repository;
   final GamificationService _gamification;
+  final LearningRepository _learningRepository;
+  final int? lessonId;
   Timer? _timer;
 
   void _startTimer() {
@@ -104,7 +111,7 @@ class MarchEducationalBloc
     final current = items[activeIdx];
     final updatedCurrent = current.copyWith(
       quizAttempts: current.quizAttempts + 1,
-      quizAnsweredCorrectly: isCorrect ? true : current.quizAnsweredCorrectly,
+      quizAnsweredCorrectly: isCorrect ? true : false,
       status: isCorrect
           ? MarchItemStatus.completed
           : MarchItemStatus.failedQuiz,
@@ -236,7 +243,18 @@ class MarchEducationalBloc
     MarchSession session,
   ) async {
     emit(state.copyWith(status: MarchEducationalStatus.saving));
+
+    // 1. Зберігаємо детальну історію MARCH
     final result = await _repository.saveSession(session);
+
+    // 2. Якщо це урок, позначаємо його як завершений з реальним відсотком
+    if (lessonId != null) {
+      await _learningRepository.completeLesson(
+        lessonId!,
+        session.successRatePercent,
+      );
+    }
+
     result.fold(
       (failure) => emit(state.copyWith(
         status: MarchEducationalStatus.finished,
