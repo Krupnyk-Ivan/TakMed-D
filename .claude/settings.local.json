@@ -10,7 +10,17 @@
       "Bash(npx supabase *)",
       "Bash(dart run *)",
       "Bash(flutter *)",
-      "Bash(supabase *)"
+      "Bash(supabase *)",
+      "PowerShell(cd \"c:\\\\Users\\\\38068\\\\TakMed D\\\\takmed\"; flutter analyze 2>&1 | Where-Object { $_ -match \"error\" } | Select-Object -First 30)",
+      "mcp__plugin_supabase_supabase__list_projects",
+      "mcp__plugin_supabase_supabase__list_migrations",
+      "mcp__plugin_supabase_supabase__apply_migration",
+      "mcp__plugin_supabase_supabase__execute_sql",
+      "mcp__plugin_supabase_supabase__get_logs",
+      "PowerShell(cd \"c:\\\\Users\\\\38068\\\\TakMed D\\\\takmed\"; flutter analyze --no-fatal-infos 2>&1 | Where-Object { $_ -match \"error|Error\" } | Select-Object -First 20)",
+      "PowerShell(cd \"c:\\\\Users\\\\38068\\\\TakMed D\\\\takmed\"; flutter analyze --no-fatal-infos 2>&1 | Where-Object { $_ -match \"error|Error\" } | Select-Object -First 10)",
+      "PowerShell(cd \"c:\\\\Users\\\\38068\\\\TakMed D\\\\takmed\"; flutter analyze --no-fatal-infos 2>&1 | Where-Object { $_ -match \"error\" } | Select-Object -First 10)",
+      "PowerShell(cd \"c:\\\\Users\\\\38068\\\\TakMed D\\\\takmed\"; flutter analyze --no-fatal-infos 2>&1 | Where-Object { $_ -match \"error\" } | Select-Object -First 5)"
     ]
   }
 }

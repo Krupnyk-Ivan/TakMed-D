@@ -43,7 +43,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -72,6 +72,11 @@ class AppDatabase extends _$AppDatabase {
       if (from < 6) {
         await m.createTable(marchHistory);
       }
+      if (from < 7) {
+        await m.addColumn(quizAttempts, quizAttempts.isDirty);
+        await m.addColumn(quizAttempts, quizAttempts.syncedAt);
+        await m.addColumn(quizAttempts, quizAttempts.updatedAt);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
@@ -94,7 +99,11 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<void> _migrateToV2(Migrator m) async {
-    await m.addColumn(lessons, lessons.updatedAt);
+    // SQLite не дозволяє нелітеральний DEFAULT в ALTER TABLE ADD COLUMN,
+    // тому використовуємо 0 (epoch) — sync перезапише реальними датами.
+    await customStatement(
+      'ALTER TABLE "lessons" ADD COLUMN "updated_at" INTEGER NOT NULL DEFAULT 0',
+    );
 
     await m.addColumn(userProgress, userProgress.userId);
     await m.addColumn(userProgress, userProgress.updatedAt);

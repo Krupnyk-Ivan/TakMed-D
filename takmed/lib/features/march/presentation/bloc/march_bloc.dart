@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/models/march_step.dart';
 import '../../domain/models/march_step_state.dart';
+import '../../domain/repositories/march_checklist_repository.dart';
 import 'march_checklist_state.dart';
 import 'march_event.dart';
 
@@ -31,14 +33,19 @@ final class _MarchStepTimedOut extends MarchEvent {
 /// Для тестів інжектуйте [timerDurationOverride] щоб пришвидшити таймаути.
 class MarchBloc extends Bloc<MarchEvent, MarchChecklistState> {
   /// Фабрика тривалості таймера.
-  /// За замовчуванням — `Duration(seconds: step.maxTimeSeconds)`.
-  /// Перевизначте в тестах: `(step) => Duration(milliseconds: 50)`.
   final Duration Function(MarchStep step) timerDurationFor;
 
+  final MarchChecklistRepository? _repository;
   final Map<MarchStep, Timer> _timers = {};
 
-  MarchBloc({Duration Function(MarchStep)? timerDurationOverride})
-      : timerDurationFor = timerDurationOverride ??
+  /// Час запуску поточної сесії — фіксується у [_onStarted].
+  DateTime? _sessionStartedAt;
+
+  MarchBloc({
+    MarchChecklistRepository? repository,
+    Duration Function(MarchStep)? timerDurationOverride,
+  })  : _repository = repository,
+        timerDurationFor = timerDurationOverride ??
             ((step) => Duration(seconds: step.defaultMaxTimeSeconds)),
         super(MarchChecklistState.initial()) {
     on<MarchStarted>(_onStarted);
@@ -55,6 +62,7 @@ class MarchBloc extends Bloc<MarchEvent, MarchChecklistState> {
 
   void _onStarted(MarchStarted event, Emitter<MarchChecklistState> emit) {
     _cancelAllTimers();
+    _sessionStartedAt = DateTime.now();
     emit(MarchChecklistState.initial(maxTimeOverrides: event.maxTimeOverrides)
         .copyWith(overallStatus: MarchOverallStatus.inProgress));
 
@@ -276,12 +284,60 @@ class MarchBloc extends Bloc<MarchEvent, MarchChecklistState> {
 
   MarchChecklistState _computeOverallStatus(MarchChecklistState s) {
     if (s.isComplete) {
+      _persistSession(s);
       return s.copyWith(overallStatus: MarchOverallStatus.completed);
     }
     if (s.hasCriticalFailure) {
       return s.copyWith(overallStatus: MarchOverallStatus.partiallyFailed);
     }
     return s.copyWith(overallStatus: MarchOverallStatus.inProgress);
+  }
+
+  /// Зберігає результати сесії у БД (fire-and-forget).
+  void _persistSession(MarchChecklistState s) {
+    final repo = _repository;
+    if (repo == null) return;
+
+    final startedAt = _sessionStartedAt ?? DateTime.now();
+
+    var totalSeconds = 0;
+    final weakTopics = <String>[];
+    final items = <Map<String, dynamic>>[];
+
+    for (final step in MarchStep.values) {
+      final stepState = s[step];
+      final elapsed = switch (stepState) {
+        StepCompleted(:final elapsedSeconds) => elapsedSeconds,
+        StepFailed() => step.defaultMaxTimeSeconds,
+        StepSkipped() => 0,
+        _ => 0,
+      };
+      totalSeconds += elapsed;
+      if (stepState is StepFailed) weakTopics.add(step.code);
+
+      items.add({
+        'step': step.code,
+        'status': switch (stepState) {
+          StepCompleted() => 'completed',
+          StepFailed() => 'failed',
+          StepSkipped() => 'skipped',
+          _ => 'pending',
+        },
+        'elapsedSeconds': elapsed,
+      });
+    }
+
+    final total = MarchStep.values.length;
+    final failed = weakTopics.length;
+    final successRate = ((total - failed) / total * 100).round();
+
+    repo.saveSession(
+      startedAt: startedAt,
+      totalDurationSeconds: totalSeconds,
+      successRatePercent: successRate,
+      weakTopics: weakTopics,
+      itemsJson: jsonEncode(items),
+    );
   }
 
   @override

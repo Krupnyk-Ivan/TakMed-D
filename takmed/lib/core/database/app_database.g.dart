@@ -1699,6 +1699,30 @@ class $QuizAttemptsTable extends QuizAttempts
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       defaultValue: const Constant('[]'));
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _isDirtyMeta =
+      const VerificationMeta('isDirty');
+  @override
+  late final GeneratedColumn<bool> isDirty = GeneratedColumn<bool>(
+      'is_dirty', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_dirty" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _syncedAtMeta =
+      const VerificationMeta('syncedAt');
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+      'synced_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   static const VerificationMeta _attemptedAtMeta =
       const VerificationMeta('attemptedAt');
   @override
@@ -1715,6 +1739,9 @@ class $QuizAttemptsTable extends QuizAttempts
         scorePercent,
         earnedXp,
         weakTopics,
+        updatedAt,
+        isDirty,
+        syncedAt,
         attemptedAt
       ];
   @override
@@ -1778,6 +1805,18 @@ class $QuizAttemptsTable extends QuizAttempts
           weakTopics.isAcceptableOrUnknown(
               data['weak_topics']!, _weakTopicsMeta));
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    if (data.containsKey('is_dirty')) {
+      context.handle(_isDirtyMeta,
+          isDirty.isAcceptableOrUnknown(data['is_dirty']!, _isDirtyMeta));
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(_syncedAtMeta,
+          syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta));
+    }
     if (data.containsKey('attempted_at')) {
       context.handle(
           _attemptedAtMeta,
@@ -1811,6 +1850,12 @@ class $QuizAttemptsTable extends QuizAttempts
           .read(DriftSqlType.int, data['${effectivePrefix}earned_xp'])!,
       weakTopics: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}weak_topics'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      isDirty: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_dirty'])!,
+      syncedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}synced_at']),
       attemptedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}attempted_at'])!,
     );
@@ -1846,6 +1891,15 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
   /// JSON-масив слабких тем.
   final String weakTopics;
 
+  /// Час останнього оновлення запису.
+  final DateTime updatedAt;
+
+  /// Чи має локальні зміни, які треба відправити на сервер.
+  final bool isDirty;
+
+  /// Час останньої успішної синхронізації цього запису.
+  final DateTime? syncedAt;
+
   /// Час проходження.
   final DateTime attemptedAt;
   const QuizAttemptDB(
@@ -1857,6 +1911,9 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
       required this.scorePercent,
       required this.earnedXp,
       required this.weakTopics,
+      required this.updatedAt,
+      required this.isDirty,
+      this.syncedAt,
       required this.attemptedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1871,6 +1928,11 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
     map['score_percent'] = Variable<int>(scorePercent);
     map['earned_xp'] = Variable<int>(earnedXp);
     map['weak_topics'] = Variable<String>(weakTopics);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['is_dirty'] = Variable<bool>(isDirty);
+    if (!nullToAbsent || syncedAt != null) {
+      map['synced_at'] = Variable<DateTime>(syncedAt);
+    }
     map['attempted_at'] = Variable<DateTime>(attemptedAt);
     return map;
   }
@@ -1887,6 +1949,11 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
       scorePercent: Value(scorePercent),
       earnedXp: Value(earnedXp),
       weakTopics: Value(weakTopics),
+      updatedAt: Value(updatedAt),
+      isDirty: Value(isDirty),
+      syncedAt: syncedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(syncedAt),
       attemptedAt: Value(attemptedAt),
     );
   }
@@ -1903,6 +1970,9 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
       scorePercent: serializer.fromJson<int>(json['scorePercent']),
       earnedXp: serializer.fromJson<int>(json['earnedXp']),
       weakTopics: serializer.fromJson<String>(json['weakTopics']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      isDirty: serializer.fromJson<bool>(json['isDirty']),
+      syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
       attemptedAt: serializer.fromJson<DateTime>(json['attemptedAt']),
     );
   }
@@ -1918,6 +1988,9 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
       'scorePercent': serializer.toJson<int>(scorePercent),
       'earnedXp': serializer.toJson<int>(earnedXp),
       'weakTopics': serializer.toJson<String>(weakTopics),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'isDirty': serializer.toJson<bool>(isDirty),
+      'syncedAt': serializer.toJson<DateTime?>(syncedAt),
       'attemptedAt': serializer.toJson<DateTime>(attemptedAt),
     };
   }
@@ -1931,6 +2004,9 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
           int? scorePercent,
           int? earnedXp,
           String? weakTopics,
+          DateTime? updatedAt,
+          bool? isDirty,
+          Value<DateTime?> syncedAt = const Value.absent(),
           DateTime? attemptedAt}) =>
       QuizAttemptDB(
         id: id ?? this.id,
@@ -1942,6 +2018,9 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
         scorePercent: scorePercent ?? this.scorePercent,
         earnedXp: earnedXp ?? this.earnedXp,
         weakTopics: weakTopics ?? this.weakTopics,
+        updatedAt: updatedAt ?? this.updatedAt,
+        isDirty: isDirty ?? this.isDirty,
+        syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
         attemptedAt: attemptedAt ?? this.attemptedAt,
       );
   QuizAttemptDB copyWithCompanion(QuizAttemptsCompanion data) {
@@ -1963,6 +2042,9 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
       earnedXp: data.earnedXp.present ? data.earnedXp.value : this.earnedXp,
       weakTopics:
           data.weakTopics.present ? data.weakTopics.value : this.weakTopics,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      isDirty: data.isDirty.present ? data.isDirty.value : this.isDirty,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
       attemptedAt:
           data.attemptedAt.present ? data.attemptedAt.value : this.attemptedAt,
     );
@@ -1979,14 +2061,28 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
           ..write('scorePercent: $scorePercent, ')
           ..write('earnedXp: $earnedXp, ')
           ..write('weakTopics: $weakTopics, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('isDirty: $isDirty, ')
+          ..write('syncedAt: $syncedAt, ')
           ..write('attemptedAt: $attemptedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, userId, lessonRemoteId, totalQuestions,
-      correctAnswers, scorePercent, earnedXp, weakTopics, attemptedAt);
+  int get hashCode => Object.hash(
+      id,
+      userId,
+      lessonRemoteId,
+      totalQuestions,
+      correctAnswers,
+      scorePercent,
+      earnedXp,
+      weakTopics,
+      updatedAt,
+      isDirty,
+      syncedAt,
+      attemptedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1999,6 +2095,9 @@ class QuizAttemptDB extends DataClass implements Insertable<QuizAttemptDB> {
           other.scorePercent == this.scorePercent &&
           other.earnedXp == this.earnedXp &&
           other.weakTopics == this.weakTopics &&
+          other.updatedAt == this.updatedAt &&
+          other.isDirty == this.isDirty &&
+          other.syncedAt == this.syncedAt &&
           other.attemptedAt == this.attemptedAt);
 }
 
@@ -2011,6 +2110,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
   final Value<int> scorePercent;
   final Value<int> earnedXp;
   final Value<String> weakTopics;
+  final Value<DateTime> updatedAt;
+  final Value<bool> isDirty;
+  final Value<DateTime?> syncedAt;
   final Value<DateTime> attemptedAt;
   const QuizAttemptsCompanion({
     this.id = const Value.absent(),
@@ -2021,6 +2123,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
     this.scorePercent = const Value.absent(),
     this.earnedXp = const Value.absent(),
     this.weakTopics = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.isDirty = const Value.absent(),
+    this.syncedAt = const Value.absent(),
     this.attemptedAt = const Value.absent(),
   });
   QuizAttemptsCompanion.insert({
@@ -2032,6 +2137,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
     required int scorePercent,
     required int earnedXp,
     this.weakTopics = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.isDirty = const Value.absent(),
+    this.syncedAt = const Value.absent(),
     required DateTime attemptedAt,
   })  : userId = Value(userId),
         totalQuestions = Value(totalQuestions),
@@ -2048,6 +2156,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
     Expression<int>? scorePercent,
     Expression<int>? earnedXp,
     Expression<String>? weakTopics,
+    Expression<DateTime>? updatedAt,
+    Expression<bool>? isDirty,
+    Expression<DateTime>? syncedAt,
     Expression<DateTime>? attemptedAt,
   }) {
     return RawValuesInsertable({
@@ -2059,6 +2170,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
       if (scorePercent != null) 'score_percent': scorePercent,
       if (earnedXp != null) 'earned_xp': earnedXp,
       if (weakTopics != null) 'weak_topics': weakTopics,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (isDirty != null) 'is_dirty': isDirty,
+      if (syncedAt != null) 'synced_at': syncedAt,
       if (attemptedAt != null) 'attempted_at': attemptedAt,
     });
   }
@@ -2072,6 +2186,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
       Value<int>? scorePercent,
       Value<int>? earnedXp,
       Value<String>? weakTopics,
+      Value<DateTime>? updatedAt,
+      Value<bool>? isDirty,
+      Value<DateTime?>? syncedAt,
       Value<DateTime>? attemptedAt}) {
     return QuizAttemptsCompanion(
       id: id ?? this.id,
@@ -2082,6 +2199,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
       scorePercent: scorePercent ?? this.scorePercent,
       earnedXp: earnedXp ?? this.earnedXp,
       weakTopics: weakTopics ?? this.weakTopics,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isDirty: isDirty ?? this.isDirty,
+      syncedAt: syncedAt ?? this.syncedAt,
       attemptedAt: attemptedAt ?? this.attemptedAt,
     );
   }
@@ -2113,6 +2233,15 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
     if (weakTopics.present) {
       map['weak_topics'] = Variable<String>(weakTopics.value);
     }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (isDirty.present) {
+      map['is_dirty'] = Variable<bool>(isDirty.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
     if (attemptedAt.present) {
       map['attempted_at'] = Variable<DateTime>(attemptedAt.value);
     }
@@ -2130,6 +2259,9 @@ class QuizAttemptsCompanion extends UpdateCompanion<QuizAttemptDB> {
           ..write('scorePercent: $scorePercent, ')
           ..write('earnedXp: $earnedXp, ')
           ..write('weakTopics: $weakTopics, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('isDirty: $isDirty, ')
+          ..write('syncedAt: $syncedAt, ')
           ..write('attemptedAt: $attemptedAt')
           ..write(')'))
         .toString();
@@ -3888,6 +4020,9 @@ typedef $$QuizAttemptsTableCreateCompanionBuilder = QuizAttemptsCompanion
   required int scorePercent,
   required int earnedXp,
   Value<String> weakTopics,
+  Value<DateTime> updatedAt,
+  Value<bool> isDirty,
+  Value<DateTime?> syncedAt,
   required DateTime attemptedAt,
 });
 typedef $$QuizAttemptsTableUpdateCompanionBuilder = QuizAttemptsCompanion
@@ -3900,6 +4035,9 @@ typedef $$QuizAttemptsTableUpdateCompanionBuilder = QuizAttemptsCompanion
   Value<int> scorePercent,
   Value<int> earnedXp,
   Value<String> weakTopics,
+  Value<DateTime> updatedAt,
+  Value<bool> isDirty,
+  Value<DateTime?> syncedAt,
   Value<DateTime> attemptedAt,
 });
 
@@ -3938,6 +4076,15 @@ class $$QuizAttemptsTableFilterComposer
 
   ColumnFilters<String> get weakTopics => $composableBuilder(
       column: $table.weakTopics, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isDirty => $composableBuilder(
+      column: $table.isDirty, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+      column: $table.syncedAt, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get attemptedAt => $composableBuilder(
       column: $table.attemptedAt, builder: (column) => ColumnFilters(column));
@@ -3980,6 +4127,15 @@ class $$QuizAttemptsTableOrderingComposer
   ColumnOrderings<String> get weakTopics => $composableBuilder(
       column: $table.weakTopics, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isDirty => $composableBuilder(
+      column: $table.isDirty, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+      column: $table.syncedAt, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get attemptedAt => $composableBuilder(
       column: $table.attemptedAt, builder: (column) => ColumnOrderings(column));
 }
@@ -4016,6 +4172,15 @@ class $$QuizAttemptsTableAnnotationComposer
 
   GeneratedColumn<String> get weakTopics => $composableBuilder(
       column: $table.weakTopics, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDirty =>
+      $composableBuilder(column: $table.isDirty, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
 
   GeneratedColumn<DateTime> get attemptedAt => $composableBuilder(
       column: $table.attemptedAt, builder: (column) => column);
@@ -4055,6 +4220,9 @@ class $$QuizAttemptsTableTableManager extends RootTableManager<
             Value<int> scorePercent = const Value.absent(),
             Value<int> earnedXp = const Value.absent(),
             Value<String> weakTopics = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDirty = const Value.absent(),
+            Value<DateTime?> syncedAt = const Value.absent(),
             Value<DateTime> attemptedAt = const Value.absent(),
           }) =>
               QuizAttemptsCompanion(
@@ -4066,6 +4234,9 @@ class $$QuizAttemptsTableTableManager extends RootTableManager<
             scorePercent: scorePercent,
             earnedXp: earnedXp,
             weakTopics: weakTopics,
+            updatedAt: updatedAt,
+            isDirty: isDirty,
+            syncedAt: syncedAt,
             attemptedAt: attemptedAt,
           ),
           createCompanionCallback: ({
@@ -4077,6 +4248,9 @@ class $$QuizAttemptsTableTableManager extends RootTableManager<
             required int scorePercent,
             required int earnedXp,
             Value<String> weakTopics = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<bool> isDirty = const Value.absent(),
+            Value<DateTime?> syncedAt = const Value.absent(),
             required DateTime attemptedAt,
           }) =>
               QuizAttemptsCompanion.insert(
@@ -4088,6 +4262,9 @@ class $$QuizAttemptsTableTableManager extends RootTableManager<
             scorePercent: scorePercent,
             earnedXp: earnedXp,
             weakTopics: weakTopics,
+            updatedAt: updatedAt,
+            isDirty: isDirty,
+            syncedAt: syncedAt,
             attemptedAt: attemptedAt,
           ),
           withReferenceMapper: (p0) => p0

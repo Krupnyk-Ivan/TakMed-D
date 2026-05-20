@@ -119,13 +119,44 @@ class _LessonEditorPageState extends State<LessonEditorPage> {
         final questions = json['questions'] as List<dynamic>? ?? [];
         for (final q in questions) {
           final map = q as Map<String, dynamic>;
-          final options = (map['options'] as List<dynamic>? ?? [])
-              .map((o) => o as String)
-              .toList();
+          final qType = map['type'] as String? ?? 'multipleChoice';
+          final isMulti = qType == 'multiSelect';
+
+          // options може бути List<String> (старий формат) або List<{id,text}> (новий)
+          final rawOptions = map['options'] as List<dynamic>? ?? [];
+          final options = rawOptions.map((o) {
+            if (o is String) return o;
+            return (o as Map<String, dynamic>)['text'] as String? ?? '';
+          }).toList();
+
+          // correctIndices: відновлюємо з correctIds (новий формат) або correctIndex (старий)
+          Set<int> correctIndices = {};
+          if (isMulti) {
+            final ids = (map['correctIds'] as List<dynamic>? ?? [])
+                .map((e) => e as String)
+                .toList();
+            correctIndices = ids
+                .map((id) => int.tryParse(id.replaceFirst('opt_', '')) ?? -1)
+                .where((i) => i >= 0)
+                .toSet();
+          }
+
+          final correctIndex = isMulti
+              ? (correctIndices.isEmpty ? 0 : correctIndices.first)
+              : (() {
+                  final cid = map['correctId'] as String?;
+                  if (cid != null) {
+                    return int.tryParse(cid.replaceFirst('opt_', '')) ?? 0;
+                  }
+                  return map['correctIndex'] as int? ?? 0;
+                })();
+
           _questions.add(_QuizQuestionData(
-            question: map['question'] as String? ?? '',
+            question: (map['question'] as String?) ?? (map['text'] as String?) ?? '',
             options: options,
-            correctIndex: map['correctIndex'] as int? ?? 0,
+            correctIndex: correctIndex,
+            correctIndices: correctIndices,
+            isMultiSelect: isMulti,
             explanation: map['explanation'] as String? ?? '',
           ));
         }

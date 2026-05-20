@@ -46,6 +46,10 @@ class GamificationService {
     await _prefs.setStringList(_completedCoursesKey, set.toList());
   }
 
+  Future<void> setTotalXp(int xp) async {
+    await _prefs.setInt(_xpKey, xp);
+  }
+
   Future<void> resetXp() async {
     await _prefs.setInt(_xpKey, 0);
   }

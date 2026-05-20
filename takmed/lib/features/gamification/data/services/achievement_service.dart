@@ -22,6 +22,17 @@ class AchievementService {
     }
   }
 
+  /// Розблоковує значок із конкретною датою (для відновлення з хмари).
+  Future<void> unlockAchievementAt(String achievementId, DateTime at) async {
+    final unlocked = getUnlockedAchievements();
+    if (unlocked.containsKey(achievementId)) return;
+    unlocked[achievementId] = at;
+    await _prefs.setString(
+      _unlockedKey,
+      jsonEncode(unlocked.map((k, v) => MapEntry(k, v.toIso8601String()))),
+    );
+  }
+
   /// Розблоковує новий значок. Повертає true, якщо значок розблоковано ВПЕРШЕ.
   Future<bool> unlockAchievement(String achievementId) async {
     final unlocked = getUnlockedAchievements();

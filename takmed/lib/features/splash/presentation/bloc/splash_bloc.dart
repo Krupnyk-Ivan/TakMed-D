@@ -48,13 +48,24 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     // 3. Тепер — чи пройдений онбординг (вибір треку тощо).
     final onboardingCompleted =
         await _onboardingRepository.isOnboardingCompleted();
+    
+    // Якщо онбординг не позначено як завершений, перевіряємо чи вибрано трек.
+    // Якщо трек вже є — вважаємо онбординг фактично завершеним для навігації.
     if (!onboardingCompleted) {
-      emit(state.copyWith(status: SplashStatus.navigateToOnboarding));
-      return;
+      final trackResult = await _onboardingRepository.getTrack();
+      final hasTrack = trackResult.fold((_) => false, (track) => track != null);
+      
+      if (!hasTrack) {
+        emit(state.copyWith(status: SplashStatus.navigateToOnboarding));
+        return;
+      } else {
+        // Якщо трек є, але статус не оновлено — оновлюємо його в фоні
+        unawaited(_onboardingRepository.setOnboardingCompleted());
+      }
     }
 
-    // 4. Усе готово — додому.
-    unawaited(_runInitialSync());
+    // 4. Підтягуємо курси з Supabase перед переходом на home.
+    await _runInitialSync();
     emit(state.copyWith(status: SplashStatus.navigateToHome));
   }
 

@@ -13,6 +13,15 @@ class StreakService {
   int getCurrentStreak() => _prefs.getInt(_currentStreakKey) ?? 0;
   int getBestStreak() => _prefs.getInt(_bestStreakKey) ?? 0;
   int getFreezesAvailable() => _prefs.getInt(_freezesAvailableKey) ?? 0;
+
+  Future<void> setCurrentStreak(int value) =>
+      _prefs.setInt(_currentStreakKey, value);
+  Future<void> setBestStreak(int value) =>
+      _prefs.setInt(_bestStreakKey, value);
+  Future<void> setFreezesAvailable(int value) =>
+      _prefs.setInt(_freezesAvailableKey, value);
+  Future<void> setLastActivityDate(DateTime date) =>
+      _prefs.setString(_lastActivityKey, date.toIso8601String());
   
   DateTime? getLastActivityDate() {
     final str = _prefs.getString(_lastActivityKey);

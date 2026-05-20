@@ -4,6 +4,8 @@ import '../../../../core/database/daos/lesson_dao.dart';
 import '../../../../core/database/daos/quiz_attempt_dao.dart';
 import '../../../gamification/data/services/gamification_service.dart';
 import '../../../gamification/data/services/streak_service.dart';
+import '../../../onboarding/domain/entities/user_track.dart';
+import '../../../onboarding/domain/usecases/save_track_use_case.dart';
 import '../../domain/usecases/get_profile_use_case.dart';
 import '../../domain/usecases/update_profile_use_case.dart';
 import 'profile_event.dart';
@@ -18,6 +20,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     this._gamification,
     this._streak,
     this._supabaseClient,
+    this._saveTrack,
   ) : super(const ProfileState()) {
     on<ProfileLoaded>(_onLoaded);
     on<ProfileNameChanged>(_onNameChanged);
@@ -34,6 +37,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final GamificationService _gamification;
   final StreakService _streak;
   final SupabaseClient _supabaseClient;
+  final SaveTrackUseCase _saveTrack;
 
   Future<void> _onLoaded(ProfileLoaded event, Emitter<ProfileState> emit) async {
     emit(state.copyWith(status: ProfileStatus.loading, clearError: true));
@@ -133,18 +137,28 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     emit(state.copyWith(status: ProfileStatus.saving, clearError: true));
     final result = await _updateProfile(draft);
-    result.fold(
-      (failure) => emit(state.copyWith(
+    await result.fold(
+      (failure) async => emit(state.copyWith(
         status: ProfileStatus.error,
         errorMessage: failure.message,
       )),
-      (profile) => emit(state.copyWith(
-        status: ProfileStatus.ready,
-        profile: profile,
-        draft: profile,
-        savedJustNow: true,
-        clearError: true,
-      )),
+      (profile) async {
+        // Зберігаємо трек локально щоб HomeBloc підхопив нові курси
+        if ((draft.track ?? '').isNotEmpty) {
+          final track = UserTrack.values.firstWhere(
+            (t) => t.name == draft.track,
+            orElse: () => UserTrack.civilian,
+          );
+          await _saveTrack(track);
+        }
+        emit(state.copyWith(
+          status: ProfileStatus.ready,
+          profile: profile,
+          draft: profile,
+          savedJustNow: true,
+          clearError: true,
+        ));
+      },
     );
   }
 }

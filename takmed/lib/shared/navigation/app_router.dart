@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_routes.dart';
+import '../../core/di/injection_container.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/ai_chat/ai_chat_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/sign_up_page.dart';
@@ -25,14 +29,65 @@ import '../../admin/presentation/pages/lessons_list_page.dart';
 import '../../features/learning/learning_page.dart';
 import '../widgets/app_shell_layout.dart';
 
+/// ChangeNotifier, що сповіщає GoRouter при кожній зміні стану AuthBloc.
+class _AuthRefreshNotifier extends ChangeNotifier {
+  _AuthRefreshNotifier(Stream<AuthState> stream) {
+    _sub = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<AuthState> _sub;
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
 /// Конфігурація маршрутизації застосунку TacMed.
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
+  // Маршрути, доступні без авторизації
+  static const _publicPaths = {
+    AppRoutes.splash,
+    AppRoutes.auth,
+    AppRoutes.login,
+    AppRoutes.register,
+    AppRoutes.passwordReset,
+  };
+
+  static String? _redirect(BuildContext context, GoRouterState state) {
+    final status = getIt<AuthBloc>().state.status;
+    final loc = state.uri.path;
+
+    // Транзитні стани: LoginPage сама обробляє навігацію після success
+    if (status == AuthStatus.initial ||
+        status == AuthStatus.loading ||
+        status == AuthStatus.success ||
+        status == AuthStatus.failure) { return null; }
+
+    final isPublic = _publicPaths.contains(loc) || loc.startsWith('/auth');
+
+    // Явно неавторизований на захищеному маршруті → login
+    if (status == AuthStatus.unauthenticated && !isPublic) {
+      return AppRoutes.login;
+    }
+
+    // Авторизований потрапив напряму на auth-екрани (наприклад, bookmark) → home
+    if (status == AuthStatus.authenticated && isPublic && loc != AppRoutes.splash) {
+      return AppRoutes.home;
+    }
+
+    return null;
+  }
 
   /// Єдиний екземпляр роутера.
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
+    redirect: _redirect,
+    refreshListenable: _AuthRefreshNotifier(getIt<AuthBloc>().stream),
     routes: <RouteBase>[
       // Splash screen
       GoRoute(

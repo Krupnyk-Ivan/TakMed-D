@@ -1292,6 +1292,32 @@ class MockQuizAttemptDao extends _i1.Mock implements _i11.QuizAttemptDao {
       ) as _i5.Future<int>);
 
   @override
+  _i5.Future<List<_i2.QuizAttemptDB>> getDirty(String? userId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getDirty,
+          [userId],
+        ),
+        returnValue:
+            _i5.Future<List<_i2.QuizAttemptDB>>.value(<_i2.QuizAttemptDB>[]),
+      ) as _i5.Future<List<_i2.QuizAttemptDB>>);
+
+  @override
+  _i5.Future<void> markSynced(
+    int? id, {
+    DateTime? at,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #markSynced,
+          [id],
+          {#at: at},
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
   _i5.Future<List<_i2.QuizAttemptDB>> getAttemptsLast30Days(String? userId) =>
       (super.noSuchMethod(
         Invocation.method(

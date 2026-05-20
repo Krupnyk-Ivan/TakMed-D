@@ -1,8 +1,9 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'i_reminder_service.dart';
 
-class StreakReminderService {
+class StreakReminderService implements IReminderService {
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
 
   static const int _notificationId = 1900;
@@ -14,6 +15,7 @@ class StreakReminderService {
     priority: Priority.high,
   );
 
+  @override
   Future<void> initialize() async {
     tz.initializeTimeZones();
     await _plugin.initialize(
@@ -39,6 +41,7 @@ class StreakReminderService {
   }
 
   /// Перевіряє, чи дозволено сповіщення на цьому пристрої.
+  @override
   Future<bool> areNotificationsEnabled() async {
     final androidImpl = _plugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
@@ -55,11 +58,13 @@ class StreakReminderService {
   }
 
   /// Скасовує всі заплановані сповіщення.
+  @override
   Future<void> cancelAll() async {
     await _plugin.cancelAll();
   }
 
   /// Планує щоденне нагадування о 19:00 з поточним стріком у заголовку.
+  @override
   Future<void> scheduleDailyReminder(int streak) async {
     final now = tz.TZDateTime.now(tz.local);
     var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, 19, 0);
@@ -77,6 +82,7 @@ class StreakReminderService {
   }
 
   /// Скасовує сьогоднішнє нагадування та планує нове на завтра.
+  @override
   Future<void> cancelReminderForToday(int streak) async {
     await _plugin.cancel(_notificationId);
 

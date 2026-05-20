@@ -138,7 +138,9 @@ class LearningRepositoryImpl implements LearningRepository {
       await _pullCoursesAndLessons(lastSync);
       await _adoptLegacyProgress(userId);
       await _pushDirtyProgress(userId);
+      await _pushDirtyQuizAttempts(userId);
       await _pullRemoteProgress(userId, lastSync);
+      await _pullQuizAttempts(userId, lastSync);
       await _recalculateCompletedLessons();
 
       await _saveLastSync(userId, DateTime.now().toUtc());
@@ -327,6 +329,79 @@ class LearningRepositoryImpl implements LearningRepository {
         );
       }
     });
+  }
+
+  Future<void> _pushDirtyQuizAttempts(String userId) async {
+    final dirtyRows = await _db.quizAttemptDao.getDirty(userId);
+    if (dirtyRows.isEmpty) {
+      return;
+    }
+
+    final payload = dirtyRows.map((row) => {
+      'user_id': userId,
+      'lesson_remote_id': row.lessonRemoteId,
+      'total_questions': row.totalQuestions,
+      'correct_answers': row.correctAnswers,
+      'score_percent': row.scorePercent,
+      'earned_xp': row.earnedXp,
+      'weak_topics': _decodeWeakTopics(row.weakTopics),
+      'attempted_at': row.attemptedAt.toUtc().toIso8601String(),
+    }).toList();
+
+    // Використовуємо прямий виклик клієнта для спрощення, 
+    // або можна додати метод у remoteDataSource.
+    await _supabaseClient.from('quiz_attempts').upsert(payload);
+
+    final syncedAt = DateTime.now().toUtc();
+    await _db.transaction(() async {
+      for (final row in dirtyRows) {
+        await _db.quizAttemptDao.markSynced(row.id, at: syncedAt);
+      }
+    });
+  }
+
+  Future<void> _pullQuizAttempts(String userId, DateTime? lastSync) async {
+    try {
+      var baseQuery = _supabaseClient
+          .from('quiz_attempts')
+          .select()
+          .eq('user_id', userId);
+
+      if (lastSync != null) {
+        baseQuery = baseQuery.gt(
+          'attempted_at',
+          lastSync.toUtc().toIso8601String(),
+        );
+      }
+
+      final rows = await baseQuery.order('attempted_at', ascending: true)
+          as List<dynamic>;
+
+      for (final raw in rows) {
+        final map = Map<String, dynamic>.from(raw as Map);
+        final attemptedAt = DateTime.tryParse(
+              map['attempted_at']?.toString() ?? '',
+            )?.toLocal() ??
+            DateTime.now();
+
+        try {
+          await _db.quizAttemptDao.saveAttempt(
+            QuizAttemptsCompanion.insert(
+              userId: userId,
+              lessonRemoteId: Value(map['lesson_remote_id'] as String?),
+              totalQuestions: (map['total_questions'] as num?)?.toInt() ?? 0,
+              correctAnswers: (map['correct_answers'] as num?)?.toInt() ?? 0,
+              scorePercent: (map['score_percent'] as num?)?.toInt() ?? 0,
+              earnedXp: (map['earned_xp'] as num?)?.toInt() ?? 0,
+              weakTopics: Value(map['weak_topics']?.toString() ?? '[]'),
+              attemptedAt: attemptedAt,
+              isDirty: const Value(false),
+              syncedAt: Value(DateTime.now().toUtc()),
+            ),
+          );
+        } catch (_) {}
+      }
+    } catch (_) {}
   }
 
   Future<void> _pullRemoteProgress(String userId, DateTime? lastSync) async {

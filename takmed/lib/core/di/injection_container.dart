@@ -33,6 +33,9 @@ import '../database/daos/march_history_dao.dart';
 import '../../features/march_educational/data/repositories/march_repository_impl.dart';
 import '../../features/march_educational/domain/repositories/march_repository.dart';
 import '../../features/march_educational/presentation/bloc/march_educational_bloc.dart';
+import '../../features/march/data/repositories/march_checklist_repository_impl.dart';
+import '../../features/march/domain/repositories/march_checklist_repository.dart';
+import '../../features/march/presentation/bloc/march_bloc.dart';
 import '../../features/ai_chat/data/datasources/chat_local_data_source.dart';
 import '../../features/ai_chat/data/datasources/chat_remote_data_source.dart';
 import '../../features/ai_chat/data/repositories/chat_repository_impl.dart';
@@ -57,11 +60,13 @@ import '../../features/learning/domain/usecases/download_course_offline_usecase.
 import '../../features/learning/domain/usecases/get_next_lesson_usecase.dart';
 import '../../features/learning/presentation/bloc/home_bloc.dart';
 import '../../features/learning/presentation/bloc/course_detail_bloc.dart';
+import '../sync/sync_service.dart';
 import '../../features/gamification/data/services/gamification_service.dart';
 import '../../features/gamification/data/services/streak_service.dart';
 import '../../features/gamification/data/services/achievement_service.dart';
 import '../../features/gamification/data/services/streak_reminder_service.dart';
 import '../../features/gamification/presentation/bloc/gamification_bloc.dart';
+import '../sync/gamification_cloud_sync.dart';
 
 /// Ініціалізація залежностей (Dependency Injection)
 final getIt = GetIt.instance;
@@ -119,14 +124,18 @@ Future<void> setupServiceLocator() async {
   // Gamification ПЕРЕД Learning (HomeBloc залежить від gamification сервісів)
   setupGamificationDI();
   setupLearningDI();
+  getIt.registerLazySingleton<SyncService>(
+    () => SyncService(
+      getIt<AppDatabase>(),
+      getIt<LearningRepository>(),
+      getIt<supabase.SupabaseClient>(),
+    ),
+  );
   setupQuizDI();
   setupProfileDI();
   setupAiChatDI();
+  setupMarchDI();
   setupMarchEducationalDI();
-
-  // Тимчасово: заповнюємо локальну базу seed даними, щоб можна було тестувати
-  // мобільний застосунок, поки адмін-панель не наповнить Supabase даними.
-  await getIt<LearningRepository>().seedIfEmpty();
 
   // Скидаємо lastSync щоб при першому запуску після міграції підтягнулись всі курси.
   const syncResetDoneKey = 'sync_reset_v3_done';
@@ -170,7 +179,8 @@ void setupAuthDI() {
   getIt.registerLazySingleton<TokenRefreshUseCase>(
     () => TokenRefreshUseCase(getIt<AuthRepository>()),
   );
-  getIt.registerFactory<AuthBloc>(
+  // lazySingleton — один екземпляр, щоб GoRouter міг читати стан через getIt<AuthBloc>()
+  getIt.registerLazySingleton<AuthBloc>(
     () => AuthBloc(
       getIt<SignInUseCase>(),
       getIt<SignUpUseCase>(),
@@ -186,7 +196,10 @@ void setupOnboardingDI() {
     () => OnboardingLocalDataSourceImpl(getIt<SharedPreferences>()),
   );
   getIt.registerLazySingleton<OnboardingRepository>(
-    () => OnboardingRepositoryImpl(getIt<OnboardingLocalDataSource>()),
+    () => OnboardingRepositoryImpl(
+      getIt<OnboardingLocalDataSource>(),
+      getIt<supabase.SupabaseClient>(),
+    ),
   );
   getIt.registerLazySingleton<SaveTrackUseCase>(
     () => SaveTrackUseCase(getIt<OnboardingRepository>()),
@@ -229,6 +242,14 @@ void setupGamificationDI() {
   getIt.registerLazySingleton<StreakReminderService>(
     () => StreakReminderService(),
   );
+  getIt.registerLazySingleton<GamificationCloudSync>(
+    () => GamificationCloudSync(
+      getIt<supabase.SupabaseClient>(),
+      getIt<GamificationService>(),
+      getIt<StreakService>(),
+      getIt<AchievementService>(),
+    ),
+  );
   // lazySingleton — один і той же екземпляр у BlocProvider та getIt<>() в initState
   getIt.registerLazySingleton<GamificationBloc>(
     () => GamificationBloc(
@@ -236,6 +257,7 @@ void setupGamificationDI() {
       getIt<StreakService>(),
       getIt<AchievementService>(),
       getIt<StreakReminderService>(),
+      getIt<GamificationCloudSync>(),
     ),
   );
 }
@@ -335,6 +357,18 @@ void setupAiChatDI() {
   );
 }
 
+void setupMarchDI() {
+  getIt.registerLazySingleton<MarchChecklistRepository>(
+    () => MarchChecklistRepositoryImpl(
+      getIt<MarchHistoryDao>(),
+      getIt<supabase.SupabaseClient>(),
+    ),
+  );
+  getIt.registerFactory<MarchBloc>(
+    () => MarchBloc(repository: getIt<MarchChecklistRepository>()),
+  );
+}
+
 void setupMarchEducationalDI() {
   getIt.registerLazySingleton<MarchRepository>(
     () => MarchRepositoryImpl(
@@ -372,6 +406,7 @@ void setupProfileDI() {
       getIt<GamificationService>(),
       getIt<StreakService>(),
       getIt<supabase.SupabaseClient>(),
+      getIt<SaveTrackUseCase>(),
     ),
   );
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/di/injection_container.dart';
+import 'core/sync/sync_service.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/onboarding/presentation/bloc/onboarding_bloc.dart';
@@ -43,6 +44,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = AppBlocObserver();
   await setupServiceLocator();
+  await SyncService.registerBackgroundSync();
   runApp(const MyApp());
 }
 

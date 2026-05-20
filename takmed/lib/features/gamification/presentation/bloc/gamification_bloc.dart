@@ -1,9 +1,11 @@
+import 'dart:async' show unawaited;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/services/achievement_service.dart';
 import '../../data/services/gamification_service.dart';
-import '../../data/services/streak_reminder_service.dart';
+import '../../data/services/i_reminder_service.dart';
 import '../../data/services/streak_service.dart';
 import '../../domain/models/achievement.dart';
+import '../../../../core/sync/gamification_cloud_sync.dart';
 import 'gamification_event.dart';
 import 'gamification_state.dart';
 
@@ -11,13 +13,15 @@ class GamificationBloc extends Bloc<GamificationEvent, GamificationState> {
   final GamificationService _gamificationService;
   final StreakService _streakService;
   final AchievementService _achievementService;
-  final StreakReminderService _reminderService;
+  final IReminderService _reminderService;
+  final GamificationCloudSync _cloudSync;
 
   GamificationBloc(
     this._gamificationService,
     this._streakService,
     this._achievementService,
     this._reminderService,
+    this._cloudSync,
   ) : super(const GamificationState()) {
     on<GamificationInitialized>(_onInitialized);
     on<GamificationLessonCompleted>(_onLessonCompleted);
@@ -29,6 +33,9 @@ class GamificationBloc extends Bloc<GamificationEvent, GamificationState> {
     GamificationInitialized event,
     Emitter<GamificationState> emit,
   ) async {
+    // Відновлюємо дані з хмари (якщо є новіші — перезаписуємо локальні)
+    await _cloudSync.restoreFromCloud();
+
     await _streakService.checkStreak();
     final xpAwarded = await _gamificationService.awardDailyLoginXp();
     final streak = _streakService.getCurrentStreak();
@@ -134,6 +141,9 @@ class GamificationBloc extends Bloc<GamificationEvent, GamificationState> {
       leveledUp: leveledUp,
       xpAwarded: totalXpAwarded,
     ));
+
+    // Пушимо оновлений стан у хмару (fire-and-forget)
+    unawaited(_cloudSync.pushToCloud());
   }
 
   Future<void> _onQuizCompleted(
@@ -190,6 +200,8 @@ class GamificationBloc extends Bloc<GamificationEvent, GamificationState> {
       leveledUp: leveledUp,
       xpAwarded: totalXpAwarded,
     ));
+
+    unawaited(_cloudSync.pushToCloud());
   }
 
   void _onEventsSeen(GamificationEventsSeen event, Emitter<GamificationState> emit) {

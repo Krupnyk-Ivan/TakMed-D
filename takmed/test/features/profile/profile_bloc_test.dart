@@ -11,6 +11,7 @@ import 'package:takmed/core/errors/failures.dart';
 import 'package:takmed/features/gamification/data/services/gamification_service.dart';
 import 'package:takmed/features/gamification/data/services/streak_service.dart';
 import 'package:takmed/features/profile/domain/entities/profile_entity.dart';
+import 'package:takmed/features/onboarding/domain/usecases/save_track_use_case.dart';
 import 'package:takmed/features/profile/domain/usecases/get_profile_use_case.dart';
 import 'package:takmed/features/profile/domain/usecases/update_profile_use_case.dart';
 import 'package:takmed/features/profile/presentation/bloc/profile_bloc.dart';
@@ -22,6 +23,7 @@ import 'profile_bloc_test.mocks.dart';
 @GenerateMocks([
   GetProfileUseCase,
   UpdateProfileUseCase,
+  SaveTrackUseCase,
   SupabaseClient,
   GoTrueClient,
 ])
@@ -30,6 +32,7 @@ void main() {
 
   late MockGetProfileUseCase mockGetProfile;
   late MockUpdateProfileUseCase mockUpdateProfile;
+  late MockSaveTrackUseCase mockSaveTrack;
   late MockSupabaseClient mockSupabase;
   late MockGoTrueClient mockAuth;
   late AppDatabase db;
@@ -50,6 +53,7 @@ void main() {
 
     mockGetProfile = MockGetProfileUseCase();
     mockUpdateProfile = MockUpdateProfileUseCase();
+    mockSaveTrack = MockSaveTrackUseCase();
     mockSupabase = MockSupabaseClient();
     mockAuth = MockGoTrueClient();
     when(mockSupabase.auth).thenReturn(mockAuth);
@@ -72,6 +76,7 @@ void main() {
         gamification,
         streak,
         mockSupabase,
+        mockSaveTrack,
       );
 
   group('ProfileLoaded', () {

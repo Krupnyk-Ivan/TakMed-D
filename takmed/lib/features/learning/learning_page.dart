@@ -3,14 +3,33 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/di/injection_container.dart';
+import 'domain/repositories/learning_repository.dart';
 import 'presentation/bloc/home_bloc.dart';
 import 'presentation/widgets/course_list_tile.dart';
 
 /// Екран навчання — повний каталог курсів за треком користувача.
 ///
 /// Перевикористовує `HomeBloc.courses` (стрім вже налаштований при старті).
-class LearningPage extends StatelessWidget {
+class LearningPage extends StatefulWidget {
   const LearningPage({super.key});
+
+  @override
+  State<LearningPage> createState() => _LearningPageState();
+}
+
+class _LearningPageState extends State<LearningPage> {
+  bool _syncing = false;
+
+  Future<void> _sync() async {
+    if (_syncing) return;
+    setState(() => _syncing = true);
+    try {
+      await getIt<LearningRepository>().syncWithServer();
+    } finally {
+      if (mounted) setState(() => _syncing = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +39,25 @@ class LearningPage extends StatelessWidget {
         backgroundColor: AppColors.surfaceColor,
         title: const Text(AppStrings.learning),
         automaticallyImplyLeading: false,
+        actions: [
+          _syncing
+              ? const Padding(
+                  padding: EdgeInsets.all(14),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primaryRed,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.sync),
+                  tooltip: 'Оновити курси',
+                  onPressed: _sync,
+                ),
+        ],
       ),
       body: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
@@ -31,17 +69,35 @@ class LearningPage extends StatelessWidget {
           }
 
           if (state.courses.isEmpty) {
-            return _buildEmpty(context);
+            return RefreshIndicator(
+              color: AppColors.primaryRed,
+              onRefresh: () async {
+                await getIt<LearningRepository>().syncWithServer();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: 400,
+                  child: _buildEmpty(context),
+                ),
+              ),
+            );
           }
 
           return SafeArea(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(AppDimensions.paddingLarge),
-              itemCount: state.courses.length,
-              separatorBuilder: (_, __) =>
-                  const SizedBox(height: AppDimensions.spacerSmall),
-              itemBuilder: (context, index) =>
-                  CourseListTile(course: state.courses[index]),
+            child: RefreshIndicator(
+              color: AppColors.primaryRed,
+              onRefresh: () async {
+                await getIt<LearningRepository>().syncWithServer();
+              },
+              child: ListView.separated(
+                padding: const EdgeInsets.all(AppDimensions.paddingLarge),
+                itemCount: state.courses.length,
+                separatorBuilder: (_, __) =>
+                    const SizedBox(height: AppDimensions.spacerSmall),
+                itemBuilder: (context, index) =>
+                    CourseListTile(course: state.courses[index]),
+              ),
             ),
           );
         },

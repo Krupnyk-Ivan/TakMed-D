@@ -67,6 +67,21 @@ class QuizAttemptDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteAttemptsByUser(String userId) =>
       (delete(quizAttempts)..where((a) => a.userId.equals(userId))).go();
 
+  /// Отримує спроби, які потребують синхронізації.
+  Future<List<QuizAttemptDB>> getDirty(String userId) =>
+      (select(quizAttempts)
+            ..where((a) => a.userId.equals(userId) & a.isDirty.equals(true)))
+          .get();
+
+  /// Позначає спробу як синхронізовану.
+  Future<void> markSynced(int id, {DateTime? at}) =>
+      (update(quizAttempts)..where((a) => a.id.equals(id))).write(
+        QuizAttemptsCompanion(
+          isDirty: const Value(false),
+          syncedAt: Value(at ?? DateTime.now()),
+        ),
+      );
+
   /// Повертає спроби за останні 30 днів, відсортовані від старих до нових.
   Future<List<QuizAttemptDB>> getAttemptsLast30Days(String userId) {
     final since = DateTime.now().subtract(const Duration(days: 30));

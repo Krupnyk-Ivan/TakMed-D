@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -33,7 +34,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await _secureStorage.write(key: _tokenKey, value: user.token);
       await _secureStorage.write(
         key: _userKey,
-        value: user.toJson().toString(),
+        value: jsonEncode(user.toJson()),
       );
       return Right<Failure, AuthUser>(user);
     } on AppAuthException catch (error) {
@@ -61,7 +62,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await _secureStorage.write(key: _tokenKey, value: user.token);
       await _secureStorage.write(
         key: _userKey,
-        value: user.toJson().toString(),
+        value: jsonEncode(user.toJson()),
       );
       return Right<Failure, AuthUser>(user);
     } on AppAuthException catch (error) {
@@ -112,7 +113,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await _secureStorage.write(key: _tokenKey, value: user.token);
       await _secureStorage.write(
         key: _userKey,
-        value: user.toJson().toString(),
+        value: jsonEncode(user.toJson()),
       );
       return Right<Failure, AuthUser>(user);
     } on AppAuthException catch (error) {
@@ -135,20 +136,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final String? userJson = await _secureStorage.read(key: _userKey);
       if (userJson == null) return null;
-      // Парсування JSON та повернення користувача
-      final Map<String, dynamic> userMap = Map<String, dynamic>.from(
-        userJson
-            .replaceAll('{', '')
-            .replaceAll('}', '')
-            .split(', ')
-            .fold<Map<String, dynamic>>({}, (map, pair) {
-              final parts = pair.split(': ');
-              if (parts.length == 2) {
-                map[parts[0]] = parts[1];
-              }
-              return map;
-            }),
-      );
+      final Map<String, dynamic> userMap =
+          jsonDecode(userJson) as Map<String, dynamic>;
       return AuthUserModel.fromJson(userMap);
     } catch (_) {
       return null;

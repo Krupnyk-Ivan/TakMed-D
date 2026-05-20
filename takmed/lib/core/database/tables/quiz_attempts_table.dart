@@ -26,6 +26,15 @@ class QuizAttempts extends Table {
   /// JSON-масив слабких тем.
   TextColumn get weakTopics => text().withDefault(const Constant('[]'))();
 
+  /// Час останнього оновлення запису.
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  /// Чи має локальні зміни, які треба відправити на сервер.
+  BoolColumn get isDirty => boolean().withDefault(const Constant(true))();
+
+  /// Час останньої успішної синхронізації цього запису.
+  DateTimeColumn get syncedAt => dateTime().nullable()();
+
   /// Час проходження.
   DateTimeColumn get attemptedAt => dateTime()();
 }

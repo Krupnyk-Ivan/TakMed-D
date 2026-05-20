@@ -9,6 +9,7 @@ import '../../core/constants/app_strings.dart';
 import '../../core/di/injection_container.dart';
 import '../auth/presentation/bloc/auth_bloc.dart';
 import '../auth/presentation/bloc/auth_event.dart';
+import '../learning/presentation/bloc/home_bloc.dart';
 import 'presentation/bloc/profile_bloc.dart';
 import 'presentation/bloc/profile_event.dart';
 import 'presentation/bloc/profile_state.dart';
@@ -16,13 +17,39 @@ import 'presentation/widgets/profile_stats_card.dart';
 import 'presentation/widgets/quiz_dynamics_chart.dart';
 
 /// Екран профілю — редагування + статистика + графік.
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  late final ProfileBloc _profileBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _profileBloc = getIt<ProfileBloc>()..add(const ProfileLoaded());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Оновлюємо stats щоразу, коли сторінка стає видимою (зміна роуту)
+    _profileBloc.add(const ProfileStatsRequested());
+  }
+
+  @override
+  void dispose() {
+    _profileBloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider<ProfileBloc>(
-      create: (_) => getIt<ProfileBloc>()..add(const ProfileLoaded()),
+    return BlocProvider<ProfileBloc>.value(
+      value: _profileBloc,
       child: const _ProfileView(),
     );
   }
@@ -55,6 +82,8 @@ class _ProfileView extends StatelessWidget {
                 backgroundColor: AppColors.successGreen,
               ),
             );
+            // Перезавантажуємо HomeBloc щоб курси відфільтрувались за новим треком
+            context.read<HomeBloc>().add(const HomeStarted());
           } else if (state.status == ProfileStatus.error &&
               state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
