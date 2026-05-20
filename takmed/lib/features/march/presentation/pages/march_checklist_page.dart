@@ -20,7 +20,7 @@ import '../widgets/march_step_card.dart';
 /// Два режими:
 /// • [lesson] == null → standalone (з головного екрану, без збереження прогресу)
 /// • [lesson] != null → урок (з описами кроків, збереженням прогресу, кнопкою завершення)
-class MarchChecklistPage extends StatelessWidget {
+class MarchChecklistPage extends StatefulWidget {
   /// Урок-джерело. Якщо null — standalone режим.
   final LessonEntity? lesson;
 
@@ -30,10 +30,35 @@ class MarchChecklistPage extends StatelessWidget {
   const MarchChecklistPage({super.key, this.lesson, this.content});
 
   @override
+  State<MarchChecklistPage> createState() => _MarchChecklistPageState();
+}
+
+class _MarchChecklistPageState extends State<MarchChecklistPage> {
+  late List<MarchStep> _displayOrder;
+
+  @override
+  void initState() {
+    super.initState();
+    // Створюємо випадковий порядок відображення кроків
+    _displayOrder = List<MarchStep>.from(MarchStep.values)..shuffle();
+  }
+
+  void _resetOrder() {
+    setState(() {
+      _displayOrder.shuffle();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => MarchBloc()..add(const MarchStarted()),
-      child: _MarchChecklistView(lesson: lesson, content: content),
+      child: _MarchChecklistView(
+        lesson: widget.lesson,
+        content: widget.content,
+        displayOrder: _displayOrder,
+        onResetOrder: _resetOrder,
+      ),
     );
   }
 }
@@ -41,10 +66,17 @@ class MarchChecklistPage extends StatelessWidget {
 // ─── View ─────────────────────────────────────────────────────────────────────
 
 class _MarchChecklistView extends StatelessWidget {
-  const _MarchChecklistView({this.lesson, this.content});
+  const _MarchChecklistView({
+    this.lesson,
+    this.content,
+    required this.displayOrder,
+    required this.onResetOrder,
+  });
 
   final LessonEntity? lesson;
   final ChecklistContent? content;
+  final List<MarchStep> displayOrder;
+  final VoidCallback onResetOrder;
 
   void _showSkipDialog(BuildContext context, MarchStep step) {
     final controller = TextEditingController();
@@ -169,6 +201,7 @@ class _MarchChecklistView extends StatelessWidget {
             icon: const Icon(Icons.refresh, color: AppColors.textSecondary),
             tooltip: 'Скинути',
             onPressed: () {
+              onResetOrder();
               ctx.read<MarchBloc>()
                 ..add(const MarchReset())
                 ..add(const MarchStarted());
@@ -196,15 +229,18 @@ class _MarchChecklistView extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-                  itemCount: MarchStep.values.length,
+                  itemCount: displayOrder.length,
                   itemBuilder: (context, index) {
-                    final step = MarchStep.values[index];
+                    final step = displayOrder[index];
                     final stepState = state.steps[step]!;
+                    
+                    // Знаходимо оригінальний індекс кроку для отримання правильного опису
+                    final originalIndex = MarchStep.values.indexOf(step);
 
-                    // Беремо опис із контенту якщо є (за індексом кроку)
+                    // Беремо опис із контенту якщо є (за ОРИГІНАЛЬНИМ індексом кроку)
                     final description = (content != null &&
-                            index < content!.steps.length)
-                        ? content!.steps[index].description
+                            originalIndex < content!.steps.length)
+                        ? content!.steps[originalIndex].description
                         : null;
 
                     return MarchStepCard(

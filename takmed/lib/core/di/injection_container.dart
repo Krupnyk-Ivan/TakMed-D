@@ -299,6 +299,7 @@ void setupLearningDI() {
       getIt<DownloadCourseOfflineUseCase>(),
       getIt<GamificationService>(),
       getIt<StreakService>(),
+      getIt<LearningRepository>(),
     ),
   );
 

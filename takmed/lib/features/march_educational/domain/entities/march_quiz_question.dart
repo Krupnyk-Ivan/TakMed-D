@@ -103,6 +103,27 @@ class MarchQuizQuestion extends Equatable {
     ),
   ];
 
-  static MarchQuizQuestion forStep(MarchStep step) =>
-      defaults.firstWhere((q) => q.step == step);
+  static MarchQuizQuestion forStep(MarchStep step) {
+    final original = defaults.firstWhere((q) => q.step == step);
+    return original.shuffled();
+  }
+
+  /// Повертає копію питання з перемішаними варіантами відповідей.
+  MarchQuizQuestion shuffled() {
+    final indexedOptions = options.asMap().entries.toList();
+    final correctOption = options[correctIndex];
+    
+    indexedOptions.shuffle();
+    
+    final newOptions = indexedOptions.map((e) => e.value).toList();
+    final newCorrectIndex = newOptions.indexOf(correctOption);
+    
+    return MarchQuizQuestion(
+      step: step,
+      question: question,
+      options: newOptions,
+      correctIndex: newCorrectIndex,
+      explanation: explanation,
+    );
+  }
 }

@@ -34,11 +34,29 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   Future<void> _onStartQuiz(StartQuiz event, Emitter<QuizState> emit) async {
     emit(const QuizLoading());
     try {
-      final questions = await _repository.getQuizQuestions(event.topicId);
+      var questions = await _repository.getQuizQuestions(event.topicId);
       if (questions.isEmpty) {
         emit(const QuizError('Немає питань для цього тесту.'));
         return;
       }
+
+      // 1. Рандомізуємо порядок питань
+      questions = questions.toList()..shuffle();
+
+      // 2. Рандомізуємо варіанти відповідей всередині кожного питання
+      questions = questions.map((q) {
+        return q.map(
+          multipleChoice: (mc) =>
+              mc.copyWith(options: mc.options.toList()..shuffle()),
+          trueFalse: (tf) => tf,
+          sequence: (s) => s.copyWith(items: s.items.toList()..shuffle()),
+          imageMatch: (im) =>
+              im.copyWith(options: im.options.toList()..shuffle()),
+          multiSelect: (ms) =>
+              ms.copyWith(options: ms.options.toList()..shuffle()),
+        );
+      }).toList();
+
       _currentLessonRemoteId = event.topicId;
       _questionStartTime = DateTime.now();
       emit(QuizInProgress(

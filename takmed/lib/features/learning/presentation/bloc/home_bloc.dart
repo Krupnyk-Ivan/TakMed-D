@@ -7,6 +7,7 @@ import '../../../gamification/domain/models/user_level.dart';
 import '../../../onboarding/domain/usecases/get_track_use_case.dart';
 import '../../domain/entities/course_entity.dart';
 import '../../domain/entities/lesson_entity.dart';
+import '../../domain/repositories/learning_repository.dart';
 import '../../domain/usecases/get_courses_by_track_usecase.dart';
 import '../../domain/usecases/get_next_lesson_usecase.dart';
 import '../../domain/usecases/download_course_offline_usecase.dart';
@@ -101,6 +102,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     this._downloadCourseOfflineUseCase,
     this._gamificationService,
     this._streakService,
+    this._learningRepository,
   ) : super(const HomeState()) {
     on<HomeStarted>(_onStarted);
     on<HomeRefreshRequested>(_onRefresh);
@@ -113,11 +115,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final DownloadCourseOfflineUseCase _downloadCourseOfflineUseCase;
   final GamificationService _gamificationService;
   final StreakService _streakService;
+  final LearningRepository _learningRepository;
 
   StreamSubscription<List<CourseEntity>>? _coursesSubscription;
 
   Future<void> _onStarted(HomeStarted event, Emitter<HomeState> emit) async {
     emit(state.copyWith(status: HomeStatus.loading));
+
+    // Запускаємо фонову синхронізацію при старті
+    unawaited(_learningRepository.syncWithServer());
 
     String track = 'military';
     final trackResult = await _getTrackUseCase();
